@@ -13,5 +13,9 @@ namespace LJBTodo.Data
         {
 
         }
+
+        public DbSet<TodoItem> TodoItems { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Escalation> Escalations { get; set; }
     }
 }

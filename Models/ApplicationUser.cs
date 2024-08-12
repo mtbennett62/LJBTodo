@@ -4,5 +4,6 @@ namespace LJBTodo.Models
 {
     public class ApplicationUser : IdentityUser
     {
+
     }
 }
