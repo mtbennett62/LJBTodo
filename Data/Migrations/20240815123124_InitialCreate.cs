@@ -54,10 +54,6 @@ namespace LJBTodo.Data.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_PersistedGrants_ConsumedTime",
-                table: "PersistedGrants",
-                column: "ConsumedTime");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUsers_TodoItemId",
