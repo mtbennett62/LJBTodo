@@ -1,6 +1,4 @@
-﻿using LJBTodo.Models.Enums;
-
-namespace LJBTodo.Models
+﻿namespace LJBTodo.Models
 {
     public class TodoItem
     {
@@ -10,7 +8,11 @@ namespace LJBTodo.Models
         public bool IsComplete { get; set; }
         public DateTime? DueDate { get; set; }
         public string? Description { get; set; }
-        public Priority Priority { get; set; }
+        public int PriorityId { get; set; }
+        public int? CategoryId { get; set; }
+
+        public virtual Category Category { get; set; }
+        public virtual Priority Priority { get; set; }
         public virtual List<Escalation> Escalations { get; } = [];
         public virtual List<ApplicationUser> IncludedUsers { get; } = [];
     }

@@ -1,0 +1,34 @@
+.TodoContainer {
+    width: 80vw;
+.TaskItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 20px;
+     .task {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+     }
+
+     .LeftContent {
+        display: flex;
+     }
+     .RightContent {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+     }
+
+    .react-datepicker-wrapper {
+        // max-width: 35%;
+        input{ 
+            width:unset;
+        }
+    }
+
+    .complete{
+        opacity: 0.5;
+    }
+}
+}

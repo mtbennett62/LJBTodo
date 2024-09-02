@@ -79,4 +79,10 @@ public class TodoController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpGet("priorities")]
+    public async Task<ActionResult<IEnumerable<Priority>>> GetPriorities()
+    {
+        return await _context.Priorities.ToListAsync();
+    }
 }
