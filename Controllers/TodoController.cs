@@ -44,6 +44,11 @@ public class TodoController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem item)
     {
+        if(item.PriorityId == 0)
+        {
+            item.PriorityId = item.Priority != null ? item.Priority.Id : 1;
+        }
+
         _context.TodoItems.Add(item);
         await _context.SaveChangesAsync();
 
