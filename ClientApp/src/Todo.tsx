@@ -45,7 +45,7 @@ function Todo() {
         isComplete: false,
         dueDate: new Date(),
         description: null,
-        priorityId: 0,
+        priorityId: 1,
         priority: priorities[0],
         escalations: [],
         includedUsers: [],
@@ -77,7 +77,7 @@ function Todo() {
     useEffect(() => {
         axios.get('https://localhost:7174/api/todo')
             .then(response => {
-                setTodos(response.data); 
+                setTodos(response.data);
                 console.log("todos", response.data);
                 setTodosLoaded(true);
             })
@@ -90,7 +90,7 @@ function Todo() {
 
     useEffect(() => {
         axios.get('https://localhost:7174/api/todo/priorities')
-            .then(response => { 
+            .then(response => {
                 setPriorities(response.data);
                 console.log("priorities", response.data);
                 setPrioritiesLoaded(true);
@@ -106,7 +106,7 @@ function Todo() {
         const todosWithPriority = todos.map(todo => {
             const priority = priorities.find(p => p.id === todo.priorityId);
             return { ...todo, priority };
-        }); 
+        });
         console.log("todosWithPriority", todosWithPriority);
 
         setTodos(todosWithPriority);
@@ -142,7 +142,7 @@ function Todo() {
                 <Dialog.Trigger asChild>
                     <button className="Button violet"><PlusIcon /></button>
                 </Dialog.Trigger>
-                <Dialog.Portal>
+                {/* <Dialog.Portal>
                     <Dialog.Overlay className="DialogOverlay" />
                     <Dialog.Content className="DialogContent">
                         <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
@@ -179,13 +179,15 @@ function Todo() {
                             </button>
                         </Dialog.Close>
                     </Dialog.Content>
-                </Dialog.Portal>
+                </Dialog.Portal> */}
+                <TaskForm todo={newTodo} isEdit={false} priorities={priorities} />
             </Dialog.Root>
+
             <ul className="TaskList">
                 {todos.map(todo => !todo.isComplete && (
                     // <li key={todo.id} className="TaskItem active">
                     //     <div
-                            
+
                     //     >
                     //         <span className="description">{todo.name}</span>
                     //         <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>
@@ -198,7 +200,7 @@ function Todo() {
                     //     <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
                     // </li>
                     // <TaskItem key={todo.id} todo={todo} onclickHandler={toggleComplete(todo)} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} />
-                    <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} />
+                    <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} priorities={priorities} />
 
                 ))}
 
@@ -219,9 +221,10 @@ function Todo() {
 
                     //     <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
                     // </li>
-                    <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} />
+                    <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} priorities={priorities} />
                 ))}
             </ul>
+
         </div>
     );
 }
@@ -232,30 +235,118 @@ type TaskItemProps = {
     handleDueDateChange: (task: TodoItem, e: any) => void;
     toggleComplete: (todo: TodoItem) => void;
     deleteTodo: (id: number) => void;
+    priorities: Priority[];
 };
 
-const TaskItem = ({todo, onclickHandler, handleDueDateChange, toggleComplete, deleteTodo}: TaskItemProps) => {
+const TaskItem = ({ todo, onclickHandler, handleDueDateChange, toggleComplete, deleteTodo, priorities }: TaskItemProps) => {
 
     return (
         <li key={todo.id} className="TaskItem complete">
             <div
-                onClick={() => onclickHandler }
+                onClick={() => onclickHandler}
                 className={todo.isComplete ? "task complete" : "task active"}
             >
-                <div className="LeftContent">
-                <span className="description">{todo.name}</span>
-                </div>
+                <Dialog.Root>
+                    <Dialog.Trigger asChild>
+                        <div className="LeftContent">
+                            <span className="description">{todo.name}</span>
+                        </div>
+                    </Dialog.Trigger>
+                    <TaskForm todo={todo} isEdit={true} priorities={priorities} />
+                </Dialog.Root>
+
                 <div className="RightContent">
-                <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>
-            <DatePicker className="Input" placeholderText="Add due date" selected={todo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
-            <Checkbox.Root className="CheckboxRoot" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)}>
-                <Checkbox.Indicator className="CheckboxIndicator"> <CheckIcon /></Checkbox.Indicator>
-            </Checkbox.Root>
-            <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
-            </div>
+                    <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>
+                    <DatePicker className="Input" placeholderText="Add due date" selected={todo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
+                    <Checkbox.Root className="CheckboxRoot" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)}>
+                        <Checkbox.Indicator className="CheckboxIndicator"> <CheckIcon /></Checkbox.Indicator>
+                    </Checkbox.Root>
+                    <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
+                </div>
             </div>
 
         </li>
+    )
+}
+
+
+type TaskFormProps = {
+    todo: TodoItem;
+    isEdit: boolean;
+    priorities: Priority[];
+}
+
+const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
+
+    const [taskItem, setTaskItem] = useState<TodoItem>(todo);
+
+    function handleTaskNameChange(e: any) {
+        setTaskItem({
+            ...taskItem,
+            name: e.target.value
+        });
+    }
+
+    function handleTaskPriorityChange(e: any) {
+        setTaskItem({
+            ...taskItem,
+            priority: e.target.value,
+            priorityId: e.target.value.id
+        });
+    }
+
+    function save() {
+        if (isEdit) {
+            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem)
+                .then(() => console.log("updated"))
+                .catch(error => console.error('There was an error!', error));
+        } else {
+            axios.post('https://localhost:7174/api/todo', taskItem)
+                .then(() => console.log("created"))
+                .catch(error => console.error('There was an error!', error));
+        }
+    }
+
+
+    return (
+        <Dialog.Portal>
+            <Dialog.Overlay className="DialogOverlay" />
+            <Dialog.Content className="DialogContent">
+                <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
+                <fieldset className="Fieldset">
+                    <label className="Label" htmlFor="description">Description</label>
+                    <input
+                        id="description"
+                        className="Input"
+                        type="text"
+                        value={todo.name}
+                        onChange={handleTaskNameChange}
+                    />
+                </fieldset>
+                <fieldset className="Fieldset">
+                    <label className="Label" htmlFor="priority">Priority</label>
+                    <select id="priority" className="Select Input" value={taskItem.priorityId} onChange={handleTaskPriorityChange}>
+                        {priorities.map(priority => (
+                            <option key={priority.id} value={priority.id}>{priority.name}</option>
+                        ))}
+                    </select>
+                </fieldset>
+                <fieldset className="date-input">
+                    <label className="Label" htmlFor="dueDate">Due Date</label>
+                    <DatePicker className="Input" selected={taskItem.dueDate} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                </fieldset>
+                <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
+                    <Dialog.Close asChild>
+                        <button className="Button green" onClick={save}>Save</button>
+                    </Dialog.Close>
+                </div>
+                <Dialog.Close asChild>
+                    <button className="IconButton" aria-label="Close">
+                        <Cross2Icon />
+                    </button>
+                </Dialog.Close>
+            </Dialog.Content>
+        </Dialog.Portal>
     )
 }
 
