@@ -50,21 +50,6 @@ function Todo() {
         escalations: [],
         includedUsers: [],
     }
-    const [newTodo, setNewTodo] = useState<TodoItem>(emptyTodo);
-
-    function handleTaskNameChange(e: any) {
-        setNewTodo({
-            ...newTodo,
-            name: e.target.value
-        });
-    }
-
-    function handleTaskPriorityChange(e: any) {
-        setNewTodo({
-            ...newTodo,
-            priority: e.target.value
-        });
-    }
 
     function handleDueDateChange(task: TodoItem, e: any) {
         const updatedTodo = { ...task, dueDate: e };
@@ -111,14 +96,6 @@ function Todo() {
 
         setTodos(todosWithPriority);
     }, [todosLoaded, prioritiesLoaded]);
-
-    const addTodo = () => {
-        console.log("posting newTodo", newTodo);
-        axios.post('https://localhost:7174/api/todo', { name: newTodo.name, priority: newTodo.priority })
-            .then(response => setTodos([...todos, response.data]))
-            .catch(error => console.error('There was an error!', error));
-        setNewTodo(emptyTodo);
-    };
 
     const deleteTodo = (id: number) => {
         axios.delete(`https://localhost:7174/api/todo/${id}`)
@@ -180,51 +157,18 @@ function Todo() {
                         </Dialog.Close>
                     </Dialog.Content>
                 </Dialog.Portal> */}
-                <TaskForm todo={newTodo} isEdit={false} priorities={priorities} />
+                <TaskForm todo={emptyTodo} isEdit={false} priorities={priorities} />
             </Dialog.Root>
 
             <ul className="TaskList">
                 {todos.map(todo => !todo.isComplete && (
-                    // <li key={todo.id} className="TaskItem active">
-                    //     <div
-
-                    //     >
-                    //         <span className="description">{todo.name}</span>
-                    //         <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>
-
-                    //     </div>
-                    //     <DatePicker className="Input" selected={newTodo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
-                    //     <Checkbox.Root className="CheckboxRoot" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)}>
-                    //         <Checkbox.Indicator />
-                    //     </Checkbox.Root>
-                    //     <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
-                    // </li>
-                    // <TaskItem key={todo.id} todo={todo} onclickHandler={toggleComplete(todo)} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} />
                     <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} priorities={priorities} />
-
                 ))}
 
                 {todos.map(todo => todo.isComplete && (
-                    // <li key={todo.id} className="TaskItem complete">
-                    //     <div
-                    //         onClick={() => toggleComplete(todo)}
-                    //         className={todo.isComplete ? 'complete' : ''}
-                    //     >
-                    //         <span className="description">{todo.name}</span>
-                    //         <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>
-
-                    //     </div>
-                    //     <DatePicker className="Input" selected={newTodo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
-                    //     <Checkbox.Root className="CheckboxRoot" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)}>
-                    //         <Checkbox.Indicator className="CheckboxIndicator"> <CheckIcon /></Checkbox.Indicator>
-                    //     </Checkbox.Root>
-
-                    //     <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
-                    // </li>
                     <TaskItem todo={todo} onclickHandler={() => toggleComplete(todo)} handleDueDateChange={() => handleDueDateChange} deleteTodo={() => deleteTodo} toggleComplete={() => toggleComplete} priorities={priorities} />
                 ))}
             </ul>
-
         </div>
     );
 }
@@ -278,7 +222,7 @@ type TaskFormProps = {
 
 const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
 
-    const [taskItem, setTaskItem] = useState<TodoItem>(todo);
+    const [taskItem, setTaskItem] = useState<TodoItem>({ ...todo });
 
     function handleTaskNameChange(e: any) {
         setTaskItem({
@@ -290,8 +234,7 @@ const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
     function handleTaskPriorityChange(e: any) {
         setTaskItem({
             ...taskItem,
-            priority: e.target.value,
-            priorityId: e.target.value.id
+            priorityId: e.target.value
         });
     }
 
@@ -311,15 +254,16 @@ const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
     return (
         <Dialog.Portal>
             <Dialog.Overlay className="DialogOverlay" />
-            <Dialog.Content className="DialogContent">
+            <Dialog.Content className="DialogContent" aria-description="task form">
                 <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
+                <Dialog.Description className="DialogDescription">Please fill in the details below</Dialog.Description>
                 <fieldset className="Fieldset">
                     <label className="Label" htmlFor="description">Description</label>
                     <input
                         id="description"
                         className="Input"
                         type="text"
-                        value={todo.name}
+                        value={taskItem.name}
                         onChange={handleTaskNameChange}
                     />
                 </fieldset>
