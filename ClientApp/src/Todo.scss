@@ -1,34 +1,54 @@
 .TodoContainer {
-    width: 80vw;
-.TaskItem {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 20px;
-     .task {
+    .TaskItem {
         display: flex;
-        justify-content: space-between;
-        width: 100%;
-     }
-
-     .LeftContent {
-        display: flex;
-     }
-     .RightContent {
-        display: flex;
-        gap: 10px;
         align-items: center;
-     }
+        justify-content: space-between;
+        margin-top: 20px;
 
-    .react-datepicker-wrapper {
-        // max-width: 35%;
-        input{ 
-            width:unset;
+        .task {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .LeftContent {
+            display: flex;
+            height: fit-content;
+            width: 100%;
+            margin-right: 10px;
+            .description{
+                display: flex;
+                width: 100%;
+                padding: 0 10px;
+                border-radius: 4px;
+            &:hover{
+                border: 1px solid #8354FE36;
+                background-color: #f9f9f9;
+            }
+        }
+        }
+
+        .RightContent {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .react-datepicker-wrapper {
+
+            // max-width: 35%;
+            input {
+                width: unset;
+            }
+        }
+
+        .complete {
+            opacity: 0.5;
         }
     }
-
-    .complete{
-        opacity: 0.5;
-    }
 }
+
+.rt-Badge.priority {
+    color: #EEEEF0;
 }
