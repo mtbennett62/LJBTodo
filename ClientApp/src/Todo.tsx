@@ -9,18 +9,18 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import './Todo.scss';
 import { Badge } from "@radix-ui/themes";
 
-
 type TodoItem = {
     id: number;
     userGuid: string;
     name: string;
     isComplete: boolean;
     dueDate: Date;
-    description: string | null;
+    description?: string;
     priorityId: number;
     priority: Priority;
-    escalations: any[];
-    includedUsers: any[];
+    escalations?: any[];
+    includedUsers?: any[];
+    estimatedHours?: number;
 };
 
 type Priority = {
@@ -40,15 +40,14 @@ function Todo() {
 
     const emptyTodo: TodoItem = {
         id: 0,
-        userGuid: '',
+        userGuid: '00000000-0000-0000-0000-000000000000',
         name: '',
         isComplete: false,
         dueDate: new Date(),
-        description: null,
         priorityId: 1,
         priority: priorities[0],
         escalations: [],
-        includedUsers: [],
+        includedUsers: []
     };
 
     useEffect(() => {
@@ -103,7 +102,7 @@ function Todo() {
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
 
-    
+
     const handleDueDateChange = useCallback((task: TodoItem, e: any) => {
         console.log("handleDueDateChange", task, e);
         const updatedTodo = { ...task, dueDate: e };
@@ -111,6 +110,20 @@ function Todo() {
             .then(() => setTodos(todos.map(t => (t.id === task.id ? updatedTodo : t)))
             )
             .catch(error => console.error('There was an error!', error));
+    }, [todos]);
+
+    const handleTaskSave = useCallback((task: TodoItem, isUpdate: boolean) => {
+        console.log("handleTaskSave", task, isUpdate);
+        if (isUpdate) {
+            console.log("todos before assign", todos.slice());
+            Object.assign(todos, todos.map(el => el.id === task.id ? task : el))
+            console.log("todos after assign", todos.slice());
+            setTodos([...todos]);
+        }
+        else {
+
+            setTodos([...todos, task]);
+        }
     }, [todos]);
 
     return (
@@ -121,16 +134,16 @@ function Todo() {
                 <Dialog.Trigger asChild>
                     <button className="Button violet"><PlusIcon /></button>
                 </Dialog.Trigger>
-                <TaskForm todo={emptyTodo} isEdit={false} priorities={priorities} />
+                <TaskForm todo={emptyTodo} isEdit={false} priorities={priorities} handleTaskSave={handleTaskSave} />
             </Dialog.Root>
 
             <ul className="TaskList">
                 {todos.map(todo => !todo.isComplete && (
-                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} />
+                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
                 ))}
 
                 {todos.map(todo => todo.isComplete && (
-                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} />
+                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
                 ))}
             </ul>
         </div>
@@ -143,9 +156,10 @@ type TaskItemProps = {
     toggleComplete: (todo: TodoItem) => void;
     deleteTodo: (id: number) => void;
     priorities: Priority[];
+    handleTaskSave: (task: TodoItem, isUpdate: boolean) => void;
 };
 
-const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, priorities }: TaskItemProps) => {
+const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, priorities, handleTaskSave }: TaskItemProps) => {
 
     return (
         <li key={todo.id} className="TaskItem complete">
@@ -158,7 +172,7 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, prior
                             <span className="description">{todo.name}</span>
                         </div>
                     </Dialog.Trigger>
-                    <TaskForm todo={todo} isEdit={true} priorities={priorities} />
+                    <TaskForm todo={todo} isEdit={true} priorities={priorities} handleTaskSave={handleTaskSave}/>
                 </Dialog.Root>
 
                 <div className="RightContent">
@@ -180,9 +194,10 @@ type TaskFormProps = {
     todo: TodoItem;
     isEdit: boolean;
     priorities: Priority[];
+    handleTaskSave: (task: TodoItem, isUpdate: boolean) => void;
 }
 
-const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
+const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) => {
 
     const [taskItem, setTaskItem] = useState<TodoItem>({ ...todo });
 
@@ -203,11 +218,17 @@ const TaskForm = ({ todo, isEdit, priorities }: TaskFormProps) => {
     function save() {
         if (isEdit) {
             axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem)
-                .then(() => console.log("updated"))
+                .then(() => {
+                    console.log("updated");
+                    handleTaskSave(taskItem, true);
+                })
                 .catch(error => console.error('There was an error!', error));
         } else {
             axios.post('https://localhost:7174/api/todo', taskItem)
-                .then(() => console.log("created"))
+                .then(() => {
+                    console.log("created");
+                    handleTaskSave(taskItem, false);
+                })
                 .catch(error => console.error('There was an error!', error));
         }
     }
