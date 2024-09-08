@@ -4,6 +4,7 @@ using LJBTodo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LJBTodo.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240828115356_MakeCategoryNullable")]
+    partial class MakeCategoryNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -244,9 +246,6 @@ namespace LJBTodo.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Category");
@@ -319,9 +318,6 @@ namespace LJBTodo.Data.Migrations
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("EstimatedHours")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsComplete")
                         .HasColumnType("bit");

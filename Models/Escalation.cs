@@ -1,6 +1,4 @@
-﻿using LJBTodo.Models.Enums;
-
-namespace LJBTodo.Models
+﻿namespace LJBTodo.Models
 {
     public class Escalation
     {
@@ -8,5 +6,6 @@ namespace LJBTodo.Models
         public DateTime EscalationDate { get; set; }
         public Priority NewPriority { get; set; }
         public long TodoItemId { get; set; }
+        public bool Escalated { get; set; }
     }
 }

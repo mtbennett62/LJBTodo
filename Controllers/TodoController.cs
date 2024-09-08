@@ -13,7 +13,7 @@ public class TodoController : ControllerBase
     public TodoController(ApplicationDbContext context)
     {
         _context = context;
-        if (_context.TodoItems.Count() == 0)
+        if (_context.TodoItems == null || _context.TodoItems.Count() == 0)
         {
             // Create a new TodoItem if collection is empty,
             // which means you can't delete all TodoItems.
@@ -44,6 +44,11 @@ public class TodoController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem item)
     {
+        if(item.PriorityId == 0)
+        {
+            item.PriorityId = item.Priority != null ? item.Priority.Id : 1;
+        }
+
         _context.TodoItems.Add(item);
         await _context.SaveChangesAsync();
 
@@ -78,5 +83,11 @@ public class TodoController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpGet("priorities")]
+    public async Task<ActionResult<IEnumerable<Priority>>> GetPriorities()
+    {
+        return await _context.Priorities.ToListAsync();
     }
 }

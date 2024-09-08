@@ -4,6 +4,7 @@ using LJBTodo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LJBTodo.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240827161155_AddPriorityTable")]
+    partial class AddPriorityTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -233,25 +235,6 @@ namespace LJBTodo.Data.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("LJBTodo.Models.Category", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ParentCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Category");
-                });
-
             modelBuilder.Entity("LJBTodo.Models.Escalation", b =>
                 {
                     b.Property<int>("Id")
@@ -311,17 +294,11 @@ namespace LJBTodo.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<int?>("EstimatedHours")
-                        .HasColumnType("int");
 
                     b.Property<bool>("IsComplete")
                         .HasColumnType("bit");
@@ -329,15 +306,13 @@ namespace LJBTodo.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("PriorityId")
+                    b.Property<int?>("PriorityId")
                         .HasColumnType("int");
 
                     b.Property<Guid>("UserGuid")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("PriorityId");
 
@@ -505,17 +480,9 @@ namespace LJBTodo.Data.Migrations
 
             modelBuilder.Entity("LJBTodo.Models.TodoItem", b =>
                 {
-                    b.HasOne("LJBTodo.Models.Category", "Category")
-                        .WithMany("TodoItems")
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("LJBTodo.Models.Priority", "Priority")
                         .WithMany()
-                        .HasForeignKey("PriorityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
+                        .HasForeignKey("PriorityId");
 
                     b.Navigation("Priority");
                 });
@@ -569,11 +536,6 @@ namespace LJBTodo.Data.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("LJBTodo.Models.Category", b =>
-                {
-                    b.Navigation("TodoItems");
                 });
 
             modelBuilder.Entity("LJBTodo.Models.TodoItem", b =>
