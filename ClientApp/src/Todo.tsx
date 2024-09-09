@@ -8,6 +8,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import * as Checkbox from "@radix-ui/react-checkbox";
 import './Todo.scss';
 import { Badge } from "@radix-ui/themes";
+import { Priority } from "./types/priority";
+
 
 type TodoItem = {
     id: number;
@@ -23,12 +25,7 @@ type TodoItem = {
     estimatedHours?: number;
 };
 
-type Priority = {
-    id: number;
-    name: string;
-    colourCode: string;
-    orderPosition: number;
-};
+
 
 
 function Todo() {

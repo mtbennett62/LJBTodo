@@ -90,4 +90,28 @@ public class TodoController : ControllerBase
     {
         return await _context.Priorities.ToListAsync();
     }
+
+    [HttpGet("categories")]
+    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    {
+        return await _context.Category.ToListAsync();
+    }
+
+    [HttpPost("categories")]
+    public async Task<ActionResult<Category>> PostCategory(Category category)
+    {
+        _context.Category.Add(category);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
+    }
+
+    [HttpPost("priorities")]
+    public async Task<ActionResult<Priority>> PostPriority(Priority priority)
+    {
+        _context.Priorities.Add(priority);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetPriorities), new { id = priority.Id }, priority);
+    }
 }
