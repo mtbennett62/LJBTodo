@@ -49,7 +49,7 @@ public class TodoController : ControllerBase
             item.PriorityId = item.Priority != null ? item.Priority.Id : 1;
         }
 
-        _context.TodoItems.Add(item);
+        var newItem = _context.TodoItems.Add(item);
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetTodoItem), new { id = item.Id }, item);
@@ -89,5 +89,57 @@ public class TodoController : ControllerBase
     public async Task<ActionResult<IEnumerable<Priority>>> GetPriorities()
     {
         return await _context.Priorities.ToListAsync();
+    }
+
+    [HttpGet("categories")]
+    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    {
+        return await _context.Category.ToListAsync();
+    }
+
+    [HttpPost("categories")]
+    public async Task<ActionResult<Category>> PostCategory(Category category)
+    {
+        _context.Category.Add(category);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
+    }
+
+    [HttpPut("categories/{id}")]
+    public async Task<IActionResult> PutCategory(long id, Category category)
+    {
+        if (id != category.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(category).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpPost("priorities")]
+    public async Task<ActionResult<Priority>> PostPriority(Priority priority)
+    {
+        _context.Priorities.Add(priority);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetPriorities), new { id = priority.Id }, priority);
+    }
+
+    [HttpPut("priorities/{id}")]
+    public async Task<IActionResult> PutPriority(long id, Priority priority)
+    {
+        if (id != priority.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(priority).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }
