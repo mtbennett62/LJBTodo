@@ -52,7 +52,6 @@ function Todo() {
         axios.get('https://localhost:7174/api/todo')
             .then(response => {
                 setTodos(response.data);
-                console.log("todos", response.data);
                 setTodosLoaded(true);
             })
             .catch(error => console.error('There was an error!', error));
@@ -64,14 +63,12 @@ function Todo() {
         axios.get('https://localhost:7174/api/todo/priorities')
             .then(response => {
                 setPriorities(response.data);
-                console.log("priorities", response.data);
                 setPrioritiesLoaded(true);
             })
             .catch(error => console.error('There was an error!', error));
     }, [prioritiesLoaded]);
 
     useEffect(() => {
-        console.log("todosLoaded", todosLoaded, "prioritiesLoaded", prioritiesLoaded);
         if (!todosLoaded || !prioritiesLoaded) {
             return;
         }
@@ -79,8 +76,6 @@ function Todo() {
             const priority = priorities.find(p => p.id === todo.priorityId);
             return { ...todo, priority };
         });
-
-        console.log("todosWithPriority", todosWithPriority);
 
         setTodos(todosWithPriority);
     }, [todosLoaded && prioritiesLoaded]);
@@ -92,7 +87,6 @@ function Todo() {
     }, [todos]);
 
     const toggleComplete = useCallback((todo: TodoItem) => {
-        console.log("toggleComplete", todo);
         const updatedTodo = { ...todo, isComplete: !todo.isComplete };
         axios.put(`https://localhost:7174/api/todo/${todo.id}`, updatedTodo)
             .then(() => setTodos(todos.map(t => (t.id === todo.id ? updatedTodo : t))))
@@ -101,7 +95,6 @@ function Todo() {
 
 
     const handleDueDateChange = useCallback((task: TodoItem, e: any) => {
-        console.log("handleDueDateChange", task, e);
         const updatedTodo = { ...task, dueDate: e };
         axios.put(`https://localhost:7174/api/todo/${task.id}`, updatedTodo)
             .then(() => setTodos(todos.map(t => (t.id === task.id ? updatedTodo : t)))
@@ -110,11 +103,8 @@ function Todo() {
     }, [todos]);
 
     const handleTaskSave = useCallback((task: TodoItem, isUpdate: boolean) => {
-        console.log("handleTaskSave", task, isUpdate);
         if (isUpdate) {
-            console.log("todos before assign", todos.slice());
             Object.assign(todos, todos.map(el => el.id === task.id ? task : el))
-            console.log("todos after assign", todos.slice());
             setTodos([...todos]);
         }
         else {
@@ -136,11 +126,11 @@ function Todo() {
 
             <ul className="TaskList">
                 {todos.map(todo => !todo.isComplete && (
-                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
+                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
                 ))}
 
                 {todos.map(todo => todo.isComplete && (
-                    <TaskItem todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
+                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodo} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
                 ))}
             </ul>
         </div>
@@ -159,7 +149,7 @@ type TaskItemProps = {
 const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, priorities, handleTaskSave }: TaskItemProps) => {
 
     return (
-        <li key={todo.id} className="TaskItem complete">
+        <li  className="TaskItem complete">
             <div
                 className={todo.isComplete ? "task complete" : "task active"}
             >
@@ -216,15 +206,13 @@ const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) =
         if (isEdit) {
             axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem)
                 .then(() => {
-                    console.log("updated");
                     handleTaskSave(taskItem, true);
                 })
                 .catch(error => console.error('There was an error!', error));
         } else {
             axios.post('https://localhost:7174/api/todo', taskItem)
-                .then(() => {
-                    console.log("created");
-                    handleTaskSave(taskItem, false);
+                .then((response) => {
+                    handleTaskSave(response.data, false);
                 })
                 .catch(error => console.error('There was an error!', error));
         }
