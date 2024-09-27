@@ -2,6 +2,9 @@ import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { useAuth } from "./provider/authProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
 import Login from "./Login";
+import Todo from "./Todo";
+import Settings from "./Settings";
+import Register from "./Register";
 
 const Routes = () => {
   const { token } = useAuth();
@@ -26,11 +29,11 @@ const Routes = () => {
       children: [
         {
           path: "/",
-          element: <div>User Home Page</div>,
+          element: <Todo />,
         },
         {
-          path: "/profile",
-          element: <div>User Profile</div>, 
+          path: "/settings",
+          element: <Settings />, 
         },
         {
           path: "/logout",
@@ -50,6 +53,10 @@ const Routes = () => {
       path: "/login",
       element: <Login />,
     },
+    {
+        path: "/register",
+        element: <Register />,
+    }
   ];
 
   // Combine and conditionally include routes based on authentication status
