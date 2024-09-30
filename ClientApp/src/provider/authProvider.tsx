@@ -31,6 +31,7 @@ const AuthProvider = ({ children } : {children: React.ReactNode}) => {
           setUser(data.email);
           setToken(response.data.accessToken);
           localStorage.setItem('user',JSON.stringify(obj));
+          axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.accessToken}`;
           window.location.href = '/';
       });
     };
@@ -39,6 +40,7 @@ const AuthProvider = ({ children } : {children: React.ReactNode}) => {
       setUser(null)
       setToken('')
       localStorage.removeItem('user')
+      delete axios.defaults.headers.common['Authorization'];
   }
 
   return (

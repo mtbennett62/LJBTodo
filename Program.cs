@@ -1,4 +1,5 @@
 using LJBTodo.Data;
+using LJBTodo.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,6 +60,7 @@ app.UseCors(MyAllowSpecificOrigins);
 app.UseAuthorization();
 
 app.MapIdentityApi<IdentityUser>();
+//app.MapIdentityApi<ApplicationUser>();
 
 app.MapControllerRoute(
     name: "default",

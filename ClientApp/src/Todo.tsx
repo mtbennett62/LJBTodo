@@ -9,6 +9,8 @@ import * as Checkbox from "@radix-ui/react-checkbox";
 import './Todo.scss';
 import { Badge } from "@radix-ui/themes";
 import { Priority } from "./types/priority";
+import { useAuth } from "./provider/authProvider";
+
 
 
 type TodoItem = {
@@ -34,6 +36,13 @@ function Todo() {
 
     const [prioritiesLoaded, setPrioritiesLoaded] = useState<boolean>(false);
     const [todosLoaded, setTodosLoaded] = useState<boolean>(false);
+    const { token } = useAuth();
+
+    const axiosConfig = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
 
     const emptyTodo: TodoItem = {
         id: 0,
@@ -49,7 +58,7 @@ function Todo() {
 
     useEffect(() => {
         if (todosLoaded) return;
-        axios.get('https://localhost:7174/api/todo')
+        axios.get('https://localhost:7174/api/todo', axiosConfig)
             .then(response => {
                 setTodos(response.data);
                 setTodosLoaded(true);
@@ -60,7 +69,7 @@ function Todo() {
 
     useEffect(() => {
         if (prioritiesLoaded) return;
-        axios.get('https://localhost:7174/api/todo/priorities')
+        axios.get('https://localhost:7174/api/todo/priorities', axiosConfig)
             .then(response => {
                 setPriorities(response.data);
                 setPrioritiesLoaded(true);
@@ -81,14 +90,14 @@ function Todo() {
     }, [todosLoaded && prioritiesLoaded]);
 
     const deleteTodo = useCallback((id: number) => {
-        axios.delete(`https://localhost:7174/api/todo/${id}`)
+        axios.delete(`https://localhost:7174/api/todo/${id}`, axiosConfig)
             .then(() => setTodos(todos.filter(todo => todo.id !== id)))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
 
     const toggleComplete = useCallback((todo: TodoItem) => {
         const updatedTodo = { ...todo, isComplete: !todo.isComplete };
-        axios.put(`https://localhost:7174/api/todo/${todo.id}`, updatedTodo)
+        axios.put(`https://localhost:7174/api/todo/${todo.id}`, updatedTodo, axiosConfig)
             .then(() => setTodos(todos.map(t => (t.id === todo.id ? updatedTodo : t))))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
@@ -96,7 +105,7 @@ function Todo() {
 
     const handleDueDateChange = useCallback((task: TodoItem, e: any) => {
         const updatedTodo = { ...task, dueDate: e };
-        axios.put(`https://localhost:7174/api/todo/${task.id}`, updatedTodo)
+        axios.put(`https://localhost:7174/api/todo/${task.id}`, updatedTodo, axiosConfig)
             .then(() => setTodos(todos.map(t => (t.id === task.id ? updatedTodo : t)))
             )
             .catch(error => console.error('There was an error!', error));
@@ -186,6 +195,14 @@ type TaskFormProps = {
 
 const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) => {
 
+    const { token } = useAuth();
+
+    const axiosConfig = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
+
     const [taskItem, setTaskItem] = useState<TodoItem>({ ...todo });
 
     function handleTaskNameChange(e: any) {
@@ -204,13 +221,13 @@ const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) =
 
     function save() {
         if (isEdit) {
-            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem)
+            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem, axiosConfig)
                 .then(() => {
                     handleTaskSave(taskItem, true);
                 })
                 .catch(error => console.error('There was an error!', error));
         } else {
-            axios.post('https://localhost:7174/api/todo', taskItem)
+            axios.post('https://localhost:7174/api/todo', taskItem, axiosConfig)
                 .then((response) => {
                     handleTaskSave(response.data, false);
                 })

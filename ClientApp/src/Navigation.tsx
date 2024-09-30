@@ -1,14 +1,15 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { useAuth } from "./provider/authProvider";
+import './Navigation.scss';
 
 
 const Navigation = () => {
     const { logout, token } = useAuth();
 
     return (
-        <NavigationMenu.Root>
+        <NavigationMenu.Root className='NavigationMenuRoot'>
             <NavigationMenu.Item>
-                <NavigationMenu.Link href="/">Home</NavigationMenu.Link>
+                <NavigationMenu.Link className="NavigationMenuLink" href="/">Home</NavigationMenu.Link>
             </NavigationMenu.Item>
             {token &&
                 <><NavigationMenu.Item>

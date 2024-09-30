@@ -1,18 +1,26 @@
 ﻿using LJBTodo.Data;
 using LJBTodo.Models;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class TodoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
 
-    public TodoController(ApplicationDbContext context)
+    private UserManager<IdentityUser> _userManager;
+
+    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
     {
         _context = context;
+        _userManager = userManager;
         if (_context.TodoItems == null || _context.TodoItems.Count() == 0)
         {
             // Create a new TodoItem if collection is empty,
@@ -23,9 +31,14 @@ public class TodoController : ControllerBase
     }
 
     [HttpGet]
+
     public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
     {
-        return await _context.TodoItems.ToListAsync();
+        ClaimsPrincipal user = this.User;
+        var userId =  _userManager.GetUserId(user);
+        var userGuid = Guid.Parse(userId);
+
+        return await _context.TodoItems.Where(x => x.UserGuid == userGuid).ToListAsync();
     }
 
     [HttpGet("{id}")]
@@ -47,6 +60,13 @@ public class TodoController : ControllerBase
         if(item.PriorityId == 0)
         {
             item.PriorityId = item.Priority != null ? item.Priority.Id : 1;
+        }
+
+        var userId = _userManager.GetUserId(this.User);
+
+        if (Guid.TryParse(userId, out Guid userGuid))
+        {
+            item.UserGuid = userGuid;
         }
 
         var newItem = _context.TodoItems.Add(item);

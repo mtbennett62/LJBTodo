@@ -1,5 +1,8 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import './Login.scss';`
+
+`
 
 const Register = () => {
     const [email, setEmail] = useState("");
@@ -31,6 +34,14 @@ const Register = () => {
             window.location.href = '/login';
         });
     };
+
+    useEffect(() => { 
+        if (confirmPassword === password || confirmPassword === '') {
+            setErrorMessage('');
+        } else {
+            setErrorMessage('Passwords do not match');
+        }
+    }, [errorMessage, confirmPassword]);
 
 
     return (
