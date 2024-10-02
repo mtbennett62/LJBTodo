@@ -10,7 +10,7 @@ export const setPriorities = (priorities: Priority[]) => {
     };
 };
 
-export const addPriority = (priority: Priority) => {
+export const addNewPriority = (priority: Priority) => {
     return {
         type: "ADD_PRIORITY",
         payload: priority

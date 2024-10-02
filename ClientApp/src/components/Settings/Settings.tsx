@@ -1,10 +1,13 @@
 import { Tabs } from "@radix-ui/themes";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { Priority } from "../../types/priority";
 import './Settings.scss';
 import { PlusIcon } from "@radix-ui/react-icons";
 import { useAuth } from "../../provider/authProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../redux/rootReducer";
+import { addNewPriority, setPriorities } from "../../redux/priorityActions";
+import { addCategory, setCategories, updateCategory } from "../../redux/categoryActions";
 
 function Settings() {
     return (
@@ -27,13 +30,13 @@ function Settings() {
     );
 }
 
-type Category = {
+export type Category = {
     id: number;
     name: string;
     parentCategoryId: number | null;
 };
 const CategorySettings = () => {
-    const [categories, setCategories] = useState<Array<Category>>([]);
+    const {categories} = useSelector((state: RootState) => state.category);
     const [newCategory, setNewCategory] = useState<string>('');
     const { token } = useAuth();
     const axiosConfig = {
@@ -41,27 +44,28 @@ const CategorySettings = () => {
             Authorization: `Bearer ${token}`
         }
     };
+    const dispatch = useDispatch();
 
     useEffect(() => {
         axios.get('https://localhost:7174/api/todo/categories', axiosConfig)
-            .then(response => setCategories(response.data))
+            .then(response => dispatch(setCategories(response.data)))
             .catch(error => console.error('There was an error!', error));
     }, []);
 
-    const addCategory = () => {
+    const addNewCategory = () => {
         axios.post('https://localhost:7174/api/todo/categories', { name: newCategory }, axiosConfig)
             .then(response => {
                 setCategories([...categories, response.data])
+                dispatch(addCategory(response.data));
                 setNewCategory('');
             })
             .catch(error => console.error('There was an error!', error));
     };
 
     const updateParentCategory = useCallback((value: number, category: Category) => {
+        dispatch(updateCategory({...category, parentCategoryId: value}));
+
         axios.put(`https://localhost:7174/api/todo/categories/${category.id}`, { ...category, parentCategoryId: value }, axiosConfig)
-            .then(response => {
-                setCategories(categories.map(c => c.id === category.id ? response.data : c));
-            })
             .catch(error => console.error('There was an error!', error));
     }, []);
 
@@ -85,7 +89,7 @@ const CategorySettings = () => {
                 ))}
                 <div className="new newCategory">
                     <input type="text" placeholder="New category" value={newCategory} onChange={e => setNewCategory(e.target.value)} />
-                    <button type="submit" onClick={addCategory}><PlusIcon /></button>
+                    <button type="submit" onClick={addNewCategory}><PlusIcon /></button>
                 </div>
             </div>
         </>
@@ -94,7 +98,8 @@ const CategorySettings = () => {
 };
 
 function PrioritySettings() {
-    const [priorities, setPriorities] = useState<Array<Priority>>([]);
+    const dispatch = useDispatch();
+    const {priorities } = useSelector((state: RootState) => state.priority);
     const [newPriority, setNewPriority] = useState<string>('');
     const { token } = useAuth();
     const axiosConfig = {
@@ -105,14 +110,14 @@ function PrioritySettings() {
 
     useEffect(() => {
         axios.get('https://localhost:7174/api/todo/priorities', axiosConfig)
-            .then(response => setPriorities(response.data))
+            .then(response => dispatch(setPriorities(response.data)))
             .catch(error => console.error('There was an error!', error));
     }, []);
 
     const addPriority = () => {
         axios.post('https://localhost:7174/api/todo/priorities', { name: newPriority }, axiosConfig)
             .then(response => {
-                setPriorities([...priorities, response.data])
+                dispatch(addNewPriority(response.data));
                 setNewPriority('');
             })
             .catch(error => console.error('There was an error!', error));
