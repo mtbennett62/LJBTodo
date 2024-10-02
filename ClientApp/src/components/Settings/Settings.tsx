@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Priority } from "../../types/priority";
 import './Settings.scss';
 import { PlusIcon } from "@radix-ui/react-icons";
+import { useAuth } from "../../provider/authProvider";
 
 function Settings() {
     return (
@@ -34,15 +35,21 @@ type Category = {
 const CategorySettings = () => {
     const [categories, setCategories] = useState<Array<Category>>([]);
     const [newCategory, setNewCategory] = useState<string>('');
+    const { token } = useAuth();
+    const axiosConfig = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
 
     useEffect(() => {
-        axios.get('https://localhost:7174/api/todo/categories')
+        axios.get('https://localhost:7174/api/todo/categories', axiosConfig)
             .then(response => setCategories(response.data))
             .catch(error => console.error('There was an error!', error));
     }, []);
 
     const addCategory = () => {
-        axios.post('https://localhost:7174/api/todo/categories', { name: newCategory })
+        axios.post('https://localhost:7174/api/todo/categories', { name: newCategory }, axiosConfig)
             .then(response => {
                 setCategories([...categories, response.data])
                 setNewCategory('');
@@ -51,7 +58,7 @@ const CategorySettings = () => {
     };
 
     const updateParentCategory = useCallback((value: number, category: Category) => {
-        axios.put(`https://localhost:7174/api/todo/categories/${category.id}`, { ...category, parentCategoryId: value })
+        axios.put(`https://localhost:7174/api/todo/categories/${category.id}`, { ...category, parentCategoryId: value }, axiosConfig)
             .then(response => {
                 setCategories(categories.map(c => c.id === category.id ? response.data : c));
             })
@@ -89,16 +96,21 @@ const CategorySettings = () => {
 function PrioritySettings() {
     const [priorities, setPriorities] = useState<Array<Priority>>([]);
     const [newPriority, setNewPriority] = useState<string>('');
-
+    const { token } = useAuth();
+    const axiosConfig = {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    };
 
     useEffect(() => {
-        axios.get('https://localhost:7174/api/todo/priorities')
+        axios.get('https://localhost:7174/api/todo/priorities', axiosConfig)
             .then(response => setPriorities(response.data))
             .catch(error => console.error('There was an error!', error));
     }, []);
 
     const addPriority = () => {
-        axios.post('https://localhost:7174/api/todo/priorities', { name: newPriority })
+        axios.post('https://localhost:7174/api/todo/priorities', { name: newPriority }, axiosConfig)
             .then(response => {
                 setPriorities([...priorities, response.data])
                 setNewPriority('');

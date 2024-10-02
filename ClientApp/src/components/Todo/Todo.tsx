@@ -15,13 +15,12 @@ import { setPriorities } from "../../redux/priorityActions";
 import { RootState } from "../../redux/rootReducer";
 
 function Todo() {
-    const { token } = useAuth();
 
     const dispatch = useDispatch();
     const { todos, todosLoaded } = useSelector((state: RootState) => state.todo);
     const { priorities, prioritiesLoaded } = useSelector((state: RootState) => state.priority);
-    console.log("state", useSelector((state: any) => state), "todos", todos, "todosLoaded", todosLoaded, "priorities", priorities);
-
+    
+    const { token } = useAuth();
     const axiosConfig = {
         headers: {
             Authorization: `Bearer ${token}`
@@ -47,9 +46,9 @@ function Todo() {
                 dispatch(setTodos(response.data));
             })
             .catch(error => console.error('There was an error!', error));
+
+
     }, [todosLoaded]);
-
-
 
     useEffect(() => {
         if (prioritiesLoaded) return;
