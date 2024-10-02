@@ -1,5 +1,5 @@
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
-import { useAuth } from "./provider/authProvider";
+import { useAuth } from "../../provider/authProvider";
 import './Navigation.scss';
 
 

@@ -1,10 +1,10 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import { useAuth } from "./provider/authProvider";
+import { useAuth } from "../../provider/authProvider";
 import { ProtectedRoute } from "./ProtectedRoute";
-import Login from "./Login";
-import Todo from "./Todo";
-import Settings from "./Settings";
-import Register from "./Register";
+import Login from "../Login/Login";
+import Todo from "../Todo/Todo";
+import Settings from "../Settings/Settings";
+import Register from "../Login/Register";
 
 const Routes = () => {
   const { token } = useAuth();

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useAuth } from "./provider/authProvider";
+import { useAuth } from "../../provider/authProvider";
 import './Login.scss';
 
 

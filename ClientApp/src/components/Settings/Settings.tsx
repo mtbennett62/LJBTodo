@@ -1,7 +1,7 @@
 import { Tabs } from "@radix-ui/themes";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
-import { Priority } from "./types/priority";
+import { Priority } from "../../types/priority";
 import './Settings.scss';
 import { PlusIcon } from "@radix-ui/react-icons";
 
