@@ -1,4 +1,4 @@
-import { Category } from "../components/Settings/Settings";
+import { Category } from "../types/category";
 
 export type CategoryAction = | {type: "SET_CATEGORIES", payload: Category[]} | {type: "ADD_CATEGORY", payload: Category} | {type: "UPDATE_CATEGORY", payload: Category};
 

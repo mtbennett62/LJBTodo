@@ -12,6 +12,7 @@ import TaskItem from "./TaskItem";
 import { useDispatch, useSelector } from "react-redux";
 import { setTodos, updateTodo, addTodo, deleteTodo } from "../../redux/todoActions";
 import { setPriorities } from "../../redux/priorityActions";
+import { setCategories } from "../../redux/categoryActions";
 import { RootState } from "../../redux/rootReducer";
 
 function Todo() {
@@ -19,6 +20,7 @@ function Todo() {
     const dispatch = useDispatch();
     const { todos, todosLoaded } = useSelector((state: RootState) => state.todo);
     const { priorities, prioritiesLoaded } = useSelector((state: RootState) => state.priority);
+    const { categoriesLoaded } = useSelector((state: RootState) => state.category);
     
     const { token } = useAuth();
     const axiosConfig = {
@@ -71,6 +73,15 @@ function Todo() {
         dispatch(setTodos(todosWithPriority));
     }, [todosLoaded && prioritiesLoaded]);
 
+    useEffect(() => {
+        if (categoriesLoaded) return;
+        axios.get('https://localhost:7174/api/todo/categories', axiosConfig)
+            .then(response => {
+                dispatch(setCategories(response.data));
+            })
+            .catch(error => console.error('There was an error!', error));
+    }), [];
+
     const deleteTodoItem = useCallback((id: number) => {
         axios.delete(`https://localhost:7174/api/todo/${id}`, axiosConfig)
             .then(() => dispatch(deleteTodo(id)))
@@ -114,11 +125,11 @@ function Todo() {
 
             <ul className="TaskList">
                 {todos.map(todo => !todo.isComplete && (
-                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
+                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
                 ))}
 
                 {todos.map(todo => todo.isComplete && (
-                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} priorities={priorities} handleTaskSave={handleTaskSave} />
+                    <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
                 ))}
             </ul>
         </div>

@@ -1,3 +1,4 @@
+import { Category } from "./category";
 import { Priority } from "./priority";
 
 export type TodoItem = {
@@ -12,4 +13,6 @@ export type TodoItem = {
     escalations?: any[];
     includedUsers?: any[];
     estimatedHours?: number;
+    categoryId?: number;
+    category?: Category;
 };

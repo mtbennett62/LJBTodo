@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
 import { addNewPriority, setPriorities } from "../../redux/priorityActions";
 import { addCategory, setCategories, updateCategory } from "../../redux/categoryActions";
+import { Category } from "../../types/category";
 
 function Settings() {
     return (
@@ -30,11 +31,7 @@ function Settings() {
     );
 }
 
-export type Category = {
-    id: number;
-    name: string;
-    parentCategoryId: number | null;
-};
+
 const CategorySettings = () => {
     const {categories} = useSelector((state: RootState) => state.category);
     const [newCategory, setNewCategory] = useState<string>('');

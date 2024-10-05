@@ -1,4 +1,4 @@
-import { Category } from "../components/Settings/Settings";
+import { Category } from "../types/category";
 import { CategoryAction } from "./categoryActions";
 
 

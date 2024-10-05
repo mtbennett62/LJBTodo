@@ -1,25 +1,29 @@
 import { useState } from "react";
 import { useAuth } from "../../provider/authProvider";
-import { Priority } from "../../types/priority";
 import { TodoItem } from "../../types/todo";
 import axios from "axios";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { Cross2Icon } from "@radix-ui/react-icons";
 import DatePicker from "react-datepicker";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/rootReducer";
 
 
 
 type TaskFormProps = {
     todo: TodoItem;
     isEdit: boolean;
-    priorities: Priority[];
     handleTaskSave: (task: TodoItem, isUpdate: boolean) => void;
 }
 
-const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) => {
+const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
+
+    const { priorities } = useSelector((state: RootState) => state.priority);
 
     const { token } = useAuth();
+    const { categories } = useSelector((state: RootState) => state.category);
+
 
     const axiosConfig = {
         headers: {
@@ -79,8 +83,16 @@ const TaskForm = ({ todo, isEdit, priorities, handleTaskSave }: TaskFormProps) =
                 <fieldset className="Fieldset">
                     <label className="Label" htmlFor="priority">Priority</label>
                     <select id="priority" className="Select Input" value={taskItem.priorityId} onChange={handleTaskPriorityChange}>
-                        {priorities.map(priority => (
+                        {priorities.length > 0 && priorities.map(priority => (
                             <option key={priority.id} value={priority.id}>{priority.name}</option>
+                        ))}
+                    </select>
+                </fieldset>
+                <fieldset className="Fieldset">
+                    <label className="Label" htmlFor="category">Category</label>
+                    <select id="category" className="Select Input" value={taskItem.categoryId} onChange={(e: any) => setTaskItem({ ...taskItem, categoryId: e.target.value })}>
+                        {categories.length > 0 &&  categories.map(category => (
+                            <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </select>
                 </fieldset>
