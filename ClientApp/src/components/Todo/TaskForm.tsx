@@ -91,7 +91,7 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
                 <fieldset className="Fieldset">
                     <label className="Label" htmlFor="category">Category</label>
                     <select id="category" className="Select Input" value={taskItem.categoryId} onChange={(e: any) => setTaskItem({ ...taskItem, categoryId: e.target.value })}>
-                        {categories.length > 0 &&  categories.map(category => (
+                        {categories.length > 0 && categories.map(category => (
                             <option key={category.id} value={category.id}>{category.name}</option>
                         ))}
                     </select>
@@ -99,6 +99,26 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
                 <fieldset className="date-input">
                     <label className="Label" htmlFor="dueDate">Due Date</label>
                     <DatePicker className="Input" selected={taskItem.dueDate} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                </fieldset>
+                <fieldset className="Fieldset">
+                    <label className="Label" htmlFor="description">Description</label>
+                    <textarea
+                        placeholder="Add description"
+                        id="description"
+                        className="Input"
+                        defaultValue={taskItem.description}
+                        onChange={(e: any) => setTaskItem({ ...taskItem, description: e.target.value })}
+                    />
+                </fieldset>
+                <fieldset className="Fieldset">
+                    <label className="Label" htmlFor="estimatedHours">Estimated Hours</label>
+                    <input
+                        placeholder="Add estimate"
+                        id="estimatedHours"
+                        className="Input"
+                        type="number"
+                        defaultValue={taskItem.estimatedHours}
+                        onChange={(e: any) => e.target.value && setTaskItem({ ...taskItem, estimatedHours: e.target.value })} />
                 </fieldset>
                 <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
                     <Dialog.Close asChild>
