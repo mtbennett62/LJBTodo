@@ -64,6 +64,7 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
                 </Dialog.Root>
 
                 <div className="RightContent">
+                    {todo.estimatedHours && <Badge variant="solid" color="gray" radius="large" className="estimatedHours">{todo.estimatedHours}h</Badge>}
                     {todo.category && <Badge className="category">{todo.category.name}</Badge>}
                     {todo.priority && <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>}
                     <DatePicker className="Input" placeholderText="Add due date" selected={todo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
