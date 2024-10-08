@@ -1,4 +1,36 @@
 .TodoContainer {
+    .TaskHeader{
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+> div {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            flex-direction: column;
+}
+
+        .filtersTrigger{
+            padding: 0 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-radius: 4px;
+            &.active{
+                border: 1px solid var(--violet-10);
+                background-color: var(--mauve-7);
+            }
+            &:hover{
+                border: 1px solid #8354FE36;
+                background-color: #f9f9f9;
+            }
+
+        }
+    }
+    .TaskList {
+        padding: 0;
+    }
+
     .TaskItem {
         display: flex;
         align-items: center;

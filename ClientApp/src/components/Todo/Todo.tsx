@@ -1,7 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { PlusIcon } from "@radix-ui/react-icons";
+import { MixerHorizontalIcon, MixIcon, PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import '../radix-components.scss';
 import 'react-datepicker/dist/react-datepicker.css'
 import './Todo.scss';
@@ -14,14 +14,42 @@ import { setTodos, updateTodo, addTodo, deleteTodo } from "../../redux/todoActio
 import { setPriorities } from "../../redux/priorityActions";
 import { setCategories } from "../../redux/categoryActions";
 import { RootState } from "../../redux/rootReducer";
+import * as Collapsible from "@radix-ui/react-collapsible";
+import clsx from "clsx";
 
 function Todo() {
 
     const dispatch = useDispatch();
     const { todos, todosLoaded } = useSelector((state: RootState) => state.todo);
     const { priorities, prioritiesLoaded } = useSelector((state: RootState) => state.priority);
-    const { categoriesLoaded } = useSelector((state: RootState) => state.category);
-    
+    const { categories, categoriesLoaded } = useSelector((state: RootState) => state.category);
+
+    const [selectedPriority, setSelectedPriority] = useState<number>();
+    const [selectedCategory, setSelectedCategory] = useState<number>();
+    const [filtersActive, setFiltersActive] = useState(false);
+
+    const filteredTodos = useMemo(() => {
+        if (!selectedPriority && !selectedCategory) {
+            setFiltersActive(false);
+            return todos;
+        }
+        setFiltersActive(true);
+
+        return todos.filter((todo) => {
+            const priorityMatch = !selectedPriority || todo.priorityId === selectedPriority;
+            const categoryMatch = !selectedCategory || todo.categoryId === selectedCategory;
+            return priorityMatch && categoryMatch;
+        });
+    }, [todos, selectedPriority, selectedCategory]);
+
+    const handlePriorityChange = useCallback((priorityId: number) => {
+        setSelectedPriority(priorityId);
+    }, []);
+
+    const handleCategoryChange = useCallback((categoryId: number) => {
+        setSelectedCategory(categoryId);
+    }, []);
+
     const { token } = useAuth();
     const axiosConfig = {
         headers: {
@@ -115,20 +143,49 @@ function Todo() {
     return (
         <div className="TodoContainer">
             <h1>Todo List</h1>
+            <div className="TaskHeader">
+                <Collapsible.Root>
+                    <Collapsible.Trigger asChild>
+                        <span className={clsx('filtersTrigger', filtersActive && 'active')}>Filters <MixerHorizontalIcon /></span>
+                    </Collapsible.Trigger>
+                    <Collapsible.Content>
+                        <fieldset className="Fieldset">
+                            <label className="Label" htmlFor="priority">Priority</label>
+                            <select id="priority" className="Select Input" value={selectedPriority} onChange={e => handlePriorityChange(Number(e.target.value))}>
+                                <option value={0}>All</option>
+                                {priorities.length > 0 && priorities.map(priority => (
+                                    <option key={priority.id} value={priority.id}>{priority.name}</option>
+                                ))}
+                            </select>
+                        </fieldset>
+                        <fieldset className="Fieldset">
+                            <label className="Label" htmlFor="category">Category</label>
+                            <select id="category" className="Select Input" value={selectedCategory} onChange={e => handleCategoryChange(Number(e.target.value))}>
+                                <option value={0}>All</option>
+                                {categories.length > 0 && categories.map(category => (
+                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                ))}
+                            </select>
+                        </fieldset>
+                    </Collapsible.Content>
+                </Collapsible.Root>
 
-            <Dialog.Root>
-                <Dialog.Trigger asChild>
-                    <button className="Button violet"><PlusIcon /></button>
-                </Dialog.Trigger>
-                <TaskForm todo={emptyTodo} isEdit={false} priorities={priorities} handleTaskSave={handleTaskSave} />
-            </Dialog.Root>
+                <Dialog.Root>
+                    <Dialog.Trigger asChild>
+                        <button className="Button violet addTodo"><PlusIcon /></button>
+                    </Dialog.Trigger>
+                    <TaskForm todo={emptyTodo} isEdit={false} handleTaskSave={handleTaskSave} />
+                </Dialog.Root>
+            </div>
+
+
 
             <ul className="TaskList">
-                {todos.map(todo => !todo.isComplete && (
+                {filteredTodos.map(todo => !todo.isComplete && (
                     <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
                 ))}
 
-                {todos.map(todo => todo.isComplete && (
+                {filteredTodos.map(todo => todo.isComplete && (
                     <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
                 ))}
             </ul>
