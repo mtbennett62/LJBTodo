@@ -16,6 +16,14 @@
         public virtual Priority Priority { get; set; }
         public virtual List<Escalation> Escalations { get; } = new List<Escalation>();
         public virtual List<ApplicationUser> IncludedUsers { get; } = new List<ApplicationUser>();
+        public virtual List<Comment> Comments { get; } = new List<Comment>();
+    }
+
+    public class Comment
+    {
+        public long Id { get; set; }
+        public string Text { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+        public Guid CreatedBy { get; set; } = Guid.Empty;
     }
 }
-

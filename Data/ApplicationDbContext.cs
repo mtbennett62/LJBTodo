@@ -21,5 +21,6 @@ namespace LJBTodo.Data
         public DbSet<Escalation> Escalations { get; set; }
         public DbSet<Priority> Priorities { get; set; }
         public DbSet<Category> Category { get; set; }
+        public DbSet<Comment> Comments { get; set; }
     }
 }
