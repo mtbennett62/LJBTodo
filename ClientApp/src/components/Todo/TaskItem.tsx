@@ -11,6 +11,7 @@ import { RootState } from "../../redux/rootReducer";
 import { useEffect } from "react";
 import { Priority } from "../../types/priority";
 import { updateTodo } from "../../redux/todoActions";
+import TaskComments from "./TaskComments";
 
 
 type TaskItemProps = {
@@ -64,6 +65,7 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
                 </Dialog.Root>
 
                 <div className="RightContent">
+                    <TaskComments todoItem={todo} />
                     {todo.estimatedHours && <Badge variant="solid" color="gray" radius="large" className="estimatedHours">{todo.estimatedHours}h</Badge>}
                     {todo.category && <Badge className="category">{todo.category.name}</Badge>}
                     {todo.priority && <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>}

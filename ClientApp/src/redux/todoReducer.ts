@@ -36,6 +36,15 @@ export const todoReducer = (state = initialState, action: TodoAction) => {
                 ...state,
                 todos: state.todos.map(todo => todo.id === action.payload.id ? action.payload : todo)
             };
+        case 'ADD_COMMENT':
+            return {
+                ...state, todos: state.todos.map(todo => todo.id === action.payload.todoItemId ? { ...todo, comments: [...(todo.comments || []), action.payload] } : todo)
+            };
+        case 'DELETE_COMMENT':
+            return {
+                ...state,
+                todos: state.todos.map(todo => todo.comments ? { ...todo, comments: todo.comments.filter(comment => comment.id !== action.payload) } : todo)
+            };
         default:
             return state;
     }

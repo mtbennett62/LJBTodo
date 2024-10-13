@@ -1,5 +1,5 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { MixerHorizontalIcon, MixIcon, PlusIcon } from "@radix-ui/react-icons";
+import { MixerHorizontalIcon, PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import '../radix-components.scss';

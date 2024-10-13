@@ -38,7 +38,7 @@ public class TodoController : ControllerBase
         var userId =  _userManager.GetUserId(user);
         var userGuid = Guid.Parse(userId);
 
-        return await _context.TodoItems.Where(x => x.UserGuid == userGuid).ToListAsync();
+        return await _context.TodoItems.Where(x => x.UserGuid == userGuid).Include(x => x.Comments).ToListAsync();
     }
 
     [HttpGet("{id}")]
@@ -161,5 +161,28 @@ public class TodoController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpGet("comments/{taskId}")]
+    public async Task<ActionResult<IEnumerable<Comment>>> GetComments(long taskId)
+    {
+        return await _context.Comments.Where(c => c.TodoItemId == taskId).ToListAsync();
+    }
+
+    [HttpPost("comment")]
+    public async Task<ActionResult<Comment>> PostComment(Comment comment)
+    {
+        comment.CreatedAt = DateTime.Now;
+        var userId = _userManager.GetUserId(this.User);
+
+        if (Guid.TryParse(userId, out Guid userGuid))
+        {
+            comment.CreatedBy = userGuid;
+        }
+
+        _context.Comments.Add(comment);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetComments), new { taskId = comment.TodoItemId }, comment);
     }
 }

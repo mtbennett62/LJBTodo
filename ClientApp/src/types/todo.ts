@@ -1,5 +1,6 @@
 import { Category } from "./category";
 import { Priority } from "./priority";
+import { Comment } from "./comment";
 
 export type TodoItem = {
     id: number;
@@ -15,4 +16,5 @@ export type TodoItem = {
     estimatedHours?: number;
     categoryId?: number;
     category?: Category;
+    comments?: Comment[];
 };
