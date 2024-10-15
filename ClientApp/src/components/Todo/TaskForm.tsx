@@ -42,13 +42,13 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
 
     function save() {
         if (isEdit) {
-            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem, getConfig())
+            axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${taskItem.id}`, taskItem, getConfig())
                 .then(() => {
                     handleTaskSave(taskItem, true);
                 })
                 .catch(error => console.error('There was an error!', error));
         } else {
-            axios.post('https://localhost:7174/api/todo', taskItem, getConfig())
+            axios.post(`${import.meta.env.VITE_API_URL}/api/todo`, taskItem, getConfig())
                 .then((response) => {
                     handleTaskSave(response.data, false);
                 })

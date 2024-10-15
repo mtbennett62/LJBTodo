@@ -28,7 +28,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState(storedInfo?.token || '');
 
   const login = (data: LoginType) => {
-    axios.post("https://localhost:7174/login", data).then(response => {
+    axios.post(`${import.meta.env.VITE_API_URL}/login`, data).then(response => {
       const expiryTime = Date.now() + response.data.expiresIn * 1000;
       console.log("response", response.data, "expiryTime", expiryTime);
       const obj = { email: data.email, token: response.data.accessToken, refreshToken: response.data.refreshToken, expiryTime: expiryTime };
@@ -42,7 +42,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshToken = () => {
     const storedInfo = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
-    axios.post("https://localhost:7174/refresh-token", { refreshToken: storedInfo.refreshToken }).then(response => {
+    axios.post(`${import.meta.env.VITE_API_URL}/refresh-token`, { refreshToken: storedInfo.refreshToken }).then(response => {
       const expiryTime = Date.now() + response.data.expiresIn * 1000;
       console.log("refresh token response", response.data, "expiryTime", expiryTime);
       const obj = { email: storedInfo.email, token: response.data.accessToken, refreshToken: response.data.refreshToken };

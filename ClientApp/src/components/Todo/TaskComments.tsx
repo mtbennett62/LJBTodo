@@ -22,7 +22,7 @@ const TaskComments = ({ todoItem }: TaskCommentsProps) => {
 
     const saveComment = () => {
         console.log('save comment');
-        axios.post(`https://localhost:7174/api/todo/comment`, { text: newComment, todoItemId: todoItem.id }, getConfig()).then(response => {
+        axios.post(`${import.meta.env.VITE_API_URL}/api/todo/comment`, { text: newComment, todoItemId: todoItem.id }, getConfig()).then(response => {
             const comment: Comment = response.data;
             dispatch({ type: 'ADD_COMMENT', payload: comment });
             setNewComment('');

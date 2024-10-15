@@ -66,7 +66,7 @@ function Todo() {
 
     useEffect(() => {
         if (todosLoaded) return;
-        axios.get('https://localhost:7174/api/todo', getConfig())
+        axios.get(`${import.meta.env.VITE_API_URL}/api/todo`, getConfig())
             .then(response => {
                 dispatch(setTodos(response.data));
             })
@@ -77,7 +77,7 @@ function Todo() {
 
     useEffect(() => {
         if (prioritiesLoaded) return;
-        axios.get('https://localhost:7174/api/todo/priorities', getConfig())
+        axios.get(`${import.meta.env.VITE_API_URL}/api/todo/priorities`, getConfig())
             .then(response => {
                 dispatch(setPriorities(response.data));
             })
@@ -98,7 +98,7 @@ function Todo() {
 
     useEffect(() => {
         if (categoriesLoaded) return;
-        axios.get('https://localhost:7174/api/todo/categories', getConfig())
+        axios.get(`${import.meta.env.VITE_API_URL}api/todo/categories`, getConfig())
             .then(response => {
                 dispatch(setCategories(response.data));
             })
@@ -106,14 +106,14 @@ function Todo() {
     }), [];
 
     const deleteTodoItem = useCallback((id: number) => {
-        axios.delete(`https://localhost:7174/api/todo/${id}`, getConfig())
+        axios.delete(`${import.meta.env.VITE_API_URL}/api/todo/${id}`, getConfig())
             .then(() => dispatch(deleteTodo(id)))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
 
     const toggleComplete = useCallback((todo: TodoItem) => {
         const updatedTodo = { ...todo, isComplete: !todo.isComplete };
-        axios.put(`https://localhost:7174/api/todo/${todo.id}`, updatedTodo, getConfig())
+        axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${todo.id}`, updatedTodo, getConfig())
             .then(() => dispatch(updateTodo(updatedTodo)))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
@@ -121,7 +121,7 @@ function Todo() {
 
     const handleDueDateChange = useCallback((task: TodoItem, e: any) => {
         const updatedTodo = { ...task, dueDate: e };
-        axios.put(`https://localhost:7174/api/todo/${task.id}`, updatedTodo, getConfig())
+        axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${task.id}`, updatedTodo, getConfig())
             .then(() => dispatch(updateTodo(updatedTodo)))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);

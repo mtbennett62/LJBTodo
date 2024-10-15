@@ -30,7 +30,7 @@ const Register = () => {
         }
         setErrorMessage('');
 
-        axios.post("https://localhost:7174/register", {email, password}).then(() => {
+        axios.post(`${import.meta.env.VITE_API_URL}/register`, {email, password}).then(() => {
             window.location.href = '/login';
         });
     };
