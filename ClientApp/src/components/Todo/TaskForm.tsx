@@ -21,15 +21,8 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
 
     const { priorities } = useSelector((state: RootState) => state.priority);
 
-    const { token } = useAuth();
+    const { getConfig } = useAuth();
     const { categories } = useSelector((state: RootState) => state.category);
-
-
-    const axiosConfig = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
 
     const [taskItem, setTaskItem] = useState<TodoItem>({ ...todo });
 
@@ -49,20 +42,19 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
 
     function save() {
         if (isEdit) {
-            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem, axiosConfig)
+            axios.put(`https://localhost:7174/api/todo/${taskItem.id}`, taskItem, getConfig())
                 .then(() => {
                     handleTaskSave(taskItem, true);
                 })
                 .catch(error => console.error('There was an error!', error));
         } else {
-            axios.post('https://localhost:7174/api/todo', taskItem, axiosConfig)
+            axios.post('https://localhost:7174/api/todo', taskItem, getConfig())
                 .then((response) => {
                     handleTaskSave(response.data, false);
                 })
                 .catch(error => console.error('There was an error!', error));
         }
     }
-
 
     return (
         <Dialog.Portal>

@@ -6,7 +6,7 @@ import axios from "axios";
 import { Comment } from "../../types/comment";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../provider/authProvider";
-import { Button, Popover, Text, TextField, Tooltip } from "@radix-ui/themes";
+import { Button, Popover, Text, TextField } from "@radix-ui/themes";
 import '../radix-components.scss';
 
 
@@ -16,20 +16,13 @@ export type TaskCommentsProps = {
 
 const TaskComments = ({ todoItem }: TaskCommentsProps) => {
     const dispatch = useDispatch();
-    const { token } = useAuth();
-    const axiosConfig = {
-        headers: {
-            Authorization: `Bearer ${token}`
-        }
-    };
+    const { getConfig } = useAuth();
 
     const [newComment, setNewComment] = useState<string>('');
 
-
-
     const saveComment = () => {
         console.log('save comment');
-        axios.post(`https://localhost:7174/api/todo/comment`, { text: newComment, todoItemId: todoItem.id }, axiosConfig).then(response => {
+        axios.post(`https://localhost:7174/api/todo/comment`, { text: newComment, todoItemId: todoItem.id }, getConfig()).then(response => {
             const comment: Comment = response.data;
             dispatch({ type: 'ADD_COMMENT', payload: comment });
             setNewComment('');
