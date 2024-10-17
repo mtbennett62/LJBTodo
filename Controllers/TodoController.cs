@@ -185,4 +185,19 @@ public class TodoController : ControllerBase
 
         return CreatedAtAction(nameof(GetComments), new { taskId = comment.TodoItemId }, comment);
     }
+
+    [HttpGet("repeatTasks")]
+    public async Task<ActionResult<IEnumerable<RepeatTaskTemplate>>> GetRepeatTasks()
+    {
+        return await _context.RepeatTaskTemplates.ToListAsync();
+    }
+
+    [HttpPost("repeatTask")]
+    public async Task<ActionResult<RepeatTaskTemplate>> PostRepeatTask(RepeatTaskTemplate repeatTask)
+    {
+        _context.RepeatTaskTemplates.Add(repeatTask);
+        await _context.SaveChangesAsync();
+
+        return CreatedAtAction(nameof(GetRepeatTasks), new { id = repeatTask.Id }, repeatTask);
+    }
 }
