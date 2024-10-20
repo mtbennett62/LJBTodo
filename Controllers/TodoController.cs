@@ -1,6 +1,7 @@
 ﻿using LJBTodo.Data;
 using LJBTodo.Models;
 using LJBTodo.Models.Tasks;
+using LJBTodo.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -15,13 +16,15 @@ using System.Security.Claims;
 public class TodoController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly ITaskService _taskService;
 
     private UserManager<IdentityUser> _userManager;
 
-    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
+    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager, TaskService taskService)
     {
         _context = context;
         _userManager = userManager;
+        _taskService = taskService;
         if (_context.TodoItems == null || _context.TodoItems.Count() == 0)
         {
             // Create a new TodoItem if collection is empty,
@@ -35,11 +38,21 @@ public class TodoController : ControllerBase
 
     public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
     {
-        ClaimsPrincipal user = this.User;
-        var userId =  _userManager.GetUserId(user);
-        var userGuid = Guid.Parse(userId);
+        try
+        {
+            ClaimsPrincipal user = this.User;
+            var userId = _userManager.GetUserId(user);
+            var userGuid = Guid.Parse(userId);
 
-        return await _context.TodoItems.Where(x => x.UserGuid == userGuid).Include(x => x.Comments).ToListAsync();
+            //return await _context.TodoItems.Where(x => x.UserGuid == userGuid).Include(x => x.Comments).ToListAsync();
+            var items = await _taskService.GetAllTasksForUser(userGuid);
+            return Ok(items);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
+
     }
 
     [HttpGet("{id}")]
@@ -58,7 +71,7 @@ public class TodoController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<TodoItem>> PostTodoItem(TodoItem item)
     {
-        if(item.PriorityId == 0)
+        if (item.PriorityId == 0)
         {
             item.PriorityId = item.Priority != null ? item.Priority.Id : 1;
         }

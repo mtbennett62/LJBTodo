@@ -1,6 +1,7 @@
 ﻿
 using LJBTodo.Data.Repositories.Interfaces;
 using LJBTodo.Models.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace LJBTodo.Data.Repositories
 {
@@ -12,36 +13,37 @@ namespace LJBTodo.Data.Repositories
         {
             _context = context;
         }
-        public void AddTodo(TodoItem todo)
+
+        public async Task AddTodo(TodoItem todo)
         {
-            _context.TodoItems.Add(todo);
+            await _context.TodoItems.AddAsync(todo);
         }
 
-        public void DeleteTodo(int id)
+        public async Task DeleteTodo(int id)
         {
-            var todo = GetTodoById(id);
+            var todo = await GetTodoById(id);
             if (todo == null) return;
             _context.TodoItems.Remove(todo);
         }
 
-        public TodoItem? GetTodoById(int id)
+        public async Task<TodoItem?> GetTodoById(int id)
         {
-           return _context.TodoItems.Find(id);
+            return await _context.TodoItems.FindAsync(id);
         }
 
-        public IEnumerable<TodoItem> GetTodoForUser(Guid userGuid)
+        public async Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid)
         {
-            return _context.TodoItems.Where(x => x.UserGuid == userGuid).ToList();
+            return await _context.TodoItems.Include(t => t.Comments).Where(x => x.UserGuid == userGuid).ToListAsync();
         }
 
         public void UpdateTodo(TodoItem todo)
         {
-            _context.TodoItems.Update(todo);
+           _context.TodoItems.Update(todo);
         }
 
-        public void Save()
+        public async Task Save()
         {
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
     }
 }
