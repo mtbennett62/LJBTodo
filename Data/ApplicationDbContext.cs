@@ -1,6 +1,7 @@
 ﻿using Duende.IdentityServer.EntityFramework.Options;
 using LJBTodo.Models;
 using LJBTodo.Models.Spaces;
+using LJBTodo.Models.Tasks;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;

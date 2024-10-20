@@ -1,5 +1,6 @@
 ﻿using LJBTodo.Data;
 using LJBTodo.Models;
+using LJBTodo.Models.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;

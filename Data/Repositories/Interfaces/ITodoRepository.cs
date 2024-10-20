@@ -1,4 +1,4 @@
-﻿using LJBTodo.Models;
+﻿using LJBTodo.Models.Tasks;
 
 namespace LJBTodo.Data.Repositories.Interfaces
 {

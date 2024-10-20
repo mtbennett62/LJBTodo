@@ -1,4 +1,6 @@
-﻿namespace LJBTodo.Models
+﻿using LJBTodo.Models.Tasks;
+
+namespace LJBTodo.Models
 {
     public class Category
     {
