@@ -9,6 +9,7 @@ import { RootState } from "../../redux/rootReducer";
 import { addNewPriority, setPriorities } from "../../redux/priorityActions";
 import { addCategory, setCategories, updateCategory } from "../../redux/categoryActions";
 import { Category } from "../../types/category";
+import SpaceSettings from "./SpaceSettings";
 
 function Settings() {
     return (
@@ -19,12 +20,16 @@ function Settings() {
                 <Tabs.List>
                     <Tabs.Trigger value="categories">Categories</Tabs.Trigger>
                     <Tabs.Trigger value="priorities">Priorities</Tabs.Trigger>
+                    <Tabs.Trigger value="spaces">Spaces</Tabs.Trigger>
                 </Tabs.List>
                 <Tabs.Content value="categories">
                     <CategorySettings />
                 </Tabs.Content>
                 <Tabs.Content value="priorities">
                     <PrioritySettings />
+                </Tabs.Content>
+                <Tabs.Content value="spaces">
+                    <SpaceSettings />
                 </Tabs.Content>
             </Tabs.Root>
         </div>
@@ -33,7 +38,7 @@ function Settings() {
 
 
 const CategorySettings = () => {
-    const {categories} = useSelector((state: RootState) => state.category);
+    const { categories } = useSelector((state: RootState) => state.category);
     const [newCategory, setNewCategory] = useState<string>('');
     const { getConfig } = useAuth();
     const dispatch = useDispatch();
@@ -55,7 +60,7 @@ const CategorySettings = () => {
     };
 
     const updateParentCategory = useCallback((value: number, category: Category) => {
-        dispatch(updateCategory({...category, parentCategoryId: value}));
+        dispatch(updateCategory({ ...category, parentCategoryId: value }));
 
         axios.put(`${import.meta.env.VITE_API_URL}/api/todo/categories/${category.id}`, { ...category, parentCategoryId: value }, getConfig())
             .catch(error => console.error('There was an error!', error));
@@ -91,7 +96,7 @@ const CategorySettings = () => {
 
 function PrioritySettings() {
     const dispatch = useDispatch();
-    const {priorities } = useSelector((state: RootState) => state.priority);
+    const { priorities } = useSelector((state: RootState) => state.priority);
     const [newPriority, setNewPriority] = useState<string>('');
     const { getConfig } = useAuth();
 

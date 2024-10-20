@@ -42,7 +42,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshToken = () => {
     const storedInfo = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user') || '{}') : null
-    axios.post(`${import.meta.env.VITE_API_URL}/refresh-token`, { refreshToken: storedInfo.refreshToken }).then(response => {
+    axios.post(`${import.meta.env.VITE_API_URL}/refresh`, { refreshToken: storedInfo.refreshToken }).then(response => {
       const expiryTime = Date.now() + response.data.expiresIn * 1000;
       console.log("refresh token response", response.data, "expiryTime", expiryTime);
       const obj = { email: storedInfo.email, token: response.data.accessToken, refreshToken: response.data.refreshToken };
