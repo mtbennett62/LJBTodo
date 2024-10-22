@@ -15,7 +15,9 @@ import { setPriorities } from "../../redux/priorityActions";
 import { setCategories } from "../../redux/categoryActions";
 import { RootState } from "../../redux/rootReducer";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import { Tabs } from "@radix-ui/themes";
 import clsx from "clsx";
+import RepeatTaskList from "./RepeatTaskList";
 
 function Todo() {
 
@@ -175,6 +177,12 @@ function Todo() {
 
 
 
+            <Tabs.Root defaultValue="regular">
+                                <Tabs.List>
+                                <Tabs.Trigger value="regular">Tasks</Tabs.Trigger>
+                                <Tabs.Trigger value="recurring">Recurring tasks</Tabs.Trigger>
+                                </Tabs.List>
+                                <Tabs.Content value="regular">
             <ul className="TaskList">
                 {filteredTodos.map(todo => !todo.isComplete && (
                     <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
@@ -184,6 +192,12 @@ function Todo() {
                     <TaskItem key={`task-item-${todo.id}`} todo={todo} handleDueDateChange={handleDueDateChange} deleteTodo={deleteTodoItem} toggleComplete={toggleComplete} handleTaskSave={handleTaskSave} />
                 ))}
             </ul>
+            </Tabs.Content>
+            <Tabs.Content value="recurring">
+                <RepeatTaskList />
+                </Tabs.Content>
+            </Tabs.Root>
+
         </div>
     );
 }
