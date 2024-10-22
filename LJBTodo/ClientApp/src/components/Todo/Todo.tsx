@@ -98,7 +98,7 @@ function Todo() {
 
     useEffect(() => {
         if (categoriesLoaded) return;
-        axios.get(`${import.meta.env.VITE_API_URL}api/todo/categories`, getConfig())
+        axios.get(`${import.meta.env.VITE_API_URL}/api/todo/categories`, getConfig())
             .then(response => {
                 dispatch(setCategories(response.data));
             })

@@ -1,5 +1,8 @@
 using LJBTodo.Data;
+using LJBTodo.Data.Repositories.Interfaces;
+using LJBTodo.Data.Repositories;
 using LJBTodo.Models;
+using LJBTodo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,6 +18,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 
+// Add TaskService dependency injection
+builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+
+builder.Services.AddScoped<ITaskService, TaskService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>

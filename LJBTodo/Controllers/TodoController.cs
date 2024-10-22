@@ -20,7 +20,7 @@ public class TodoController : ControllerBase
 
     private UserManager<IdentityUser> _userManager;
 
-    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager, TaskService taskService)
+    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager, ITaskService taskService)
     {
         _context = context;
         _userManager = userManager;
