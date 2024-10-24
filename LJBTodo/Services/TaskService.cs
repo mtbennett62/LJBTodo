@@ -6,14 +6,34 @@ namespace LJBTodo.Services
     public class TaskService : ITaskService
     {
         private readonly ITodoRepository _todoRepository;
-        public TaskService(ITodoRepository todoRepository)
+        private readonly IRepository<RepeatTaskTemplate> _repeatTaskTemplateRepository;
+        public TaskService(ITodoRepository todoRepository, IRepository<RepeatTaskTemplate> repeateTaskTemplateRepository)
         {
             _todoRepository = todoRepository;
+            _repeatTaskTemplateRepository = repeateTaskTemplateRepository;
         }
 
-        public async Task<TodoItem> CreateTask(TodoItem task)
+        public async Task<T> CreateTask<T>(T task) where T : TaskItem
         {
-            throw new NotImplementedException();
+            if (task.PriorityId == 0)
+            {
+                task.PriorityId = task.Priority != null ? task.Priority.Id : 1;
+            }
+
+            if (typeof(T) == typeof(TodoItem))
+            {
+                var todoTask = task as TodoItem;
+                return await _todoRepository.CreateAsync(todoTask) as T;
+            }
+            else if (typeof(T) == typeof(RepeatTaskTemplate))
+            {
+                var repeatTask = task as RepeatTaskTemplate;
+                return await _repeatTaskTemplateRepository.CreateAsync(repeatTask) as T;
+            }
+            else
+            {
+                throw new ArgumentException("Invalid task type.");
+            }
         }
 
         public async Task<bool> DeleteTask(long taskId)

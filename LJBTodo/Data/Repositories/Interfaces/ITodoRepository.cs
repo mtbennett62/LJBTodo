@@ -2,13 +2,8 @@
 
 namespace LJBTodo.Data.Repositories.Interfaces
 {
-    public interface ITodoRepository
+    public interface ITodoRepository : IRepository<TodoItem>
     {
-        Task AddTodo(TodoItem todo);
-        Task DeleteTodo(int id);
-        void UpdateTodo(TodoItem todo);
-        Task<TodoItem?> GetTodoById(int id);
         Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid);
-        Task Save();
     }
 }

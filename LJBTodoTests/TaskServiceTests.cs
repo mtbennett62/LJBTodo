@@ -17,12 +17,14 @@ namespace LJBTodo.Tests.Services
     {
         private Mock<ITodoRepository> _todoRepositoryMock;
         private TaskService _taskService;
+        private Mock<IRepository<RepeatTaskTemplate>> _repeatTaskTemplateRepositoryMock;
 
         [SetUp]
         public void Setup()
         {
             _todoRepositoryMock = new Mock<ITodoRepository>();
-            _taskService = new TaskService(_todoRepositoryMock.Object);
+            _repeatTaskTemplateRepositoryMock = new Mock<IRepository<RepeatTaskTemplate>>();
+            _taskService = new TaskService(_todoRepositoryMock.Object, _repeatTaskTemplateRepositoryMock.Object);
         }
 
         [Test]
@@ -115,6 +117,20 @@ namespace LJBTodo.Tests.Services
         // Add more unit tests for other methods
 
         // public async Task<TodoItem> CreateTask(TodoItem task)
+        [Test]
+        public async Task CreateTask_ShouldCreateTask()
+        {
+            // Arrange
+            var task = new TodoItem { Id = 1, Description = "Task 1" };
+            _todoRepositoryMock.Setup(repo => repo.CreateAsync(task, false)).ReturnsAsync(task);
+
+            // Act
+            var result = await _taskService.CreateTask(task);
+
+            // Assert
+            Assert.That(result.Equals(task));
+        }
+         
         // public async Task<bool> DeleteTask(long taskId)
         // public async Task<TodoItem> GetTaskById(long taskId)
         // public async Task<TodoItem> UpdateTask(TodoItem task)

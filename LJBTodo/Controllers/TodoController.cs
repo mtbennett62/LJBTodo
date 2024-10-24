@@ -83,10 +83,12 @@ public class TodoController : ControllerBase
             item.UserGuid = userGuid;
         }
 
-        var newItem = _context.TodoItems.Add(item);
-        await _context.SaveChangesAsync();
+        //var newItem = _context.TodoItems.Add(item);
+        //await _context.SaveChangesAsync();
 
-        return CreatedAtAction(nameof(GetTodoItem), new { id = item.Id }, item);
+        var newItem = await _taskService.CreateTask(item);
+
+        return CreatedAtAction(nameof(GetTodoItem), new { id = newItem.Id }, newItem);
     }
 
     [HttpPut("{id}")]
@@ -213,5 +215,19 @@ public class TodoController : ControllerBase
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetRepeatTasks), new { id = repeatTask.Id }, repeatTask);
+    }
+
+    [HttpPut("repeatTask/{id}")]
+    public async Task<IActionResult> PutRepeatTask(long id, RepeatTaskTemplate repeatTask)
+    {
+        if (id != repeatTask.Id)
+        {
+            return BadRequest();
+        }
+
+        _context.Entry(repeatTask).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }

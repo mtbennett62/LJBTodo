@@ -6,7 +6,7 @@ namespace LJBTodo.Services
     {
         Task<IEnumerable<TodoItem>> GetAllTasksForUser(Guid userId);
         Task<TodoItem> GetTaskById(long taskId);
-        Task<TodoItem> CreateTask(TodoItem task);
+        Task<T> CreateTask<T>(T task) where T : TaskItem;
         Task<TodoItem> UpdateTask(TodoItem task);
         Task<bool> DeleteTask(long taskId);
     }
