@@ -5,8 +5,8 @@
         Task<TEntity> CreateAsync(TEntity entity, bool? saveChanges = null);
 
         TEntity UpdateAsync(TEntity entity, bool? saveChanges = null);
-        Task DeleteAsync(int id, bool? saveChanges = null);
-        Task<TEntity> GetByIdAsync(int id);
+        Task DeleteAsync(long id, bool? saveChanges = null);
+        Task<TEntity> GetByIdAsync(long id);
         Task SaveAsync();
 
     }

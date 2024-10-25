@@ -20,7 +20,7 @@ namespace LJBTodo.Data.Repositories
             return entity;
         }
 
-        public async Task DeleteAsync(int id, bool? saveChanges = null)
+        public async Task DeleteAsync(long id, bool? saveChanges = null)
         {
             var entity = await GetByIdAsync(id);
             if (entity == null) return;
@@ -31,7 +31,7 @@ namespace LJBTodo.Data.Repositories
             }
         }
 
-        public async Task<TEntity> GetByIdAsync(int id)
+        public async Task<TEntity> GetByIdAsync(long id)
         {
             return await _context.Set<TEntity>().FindAsync(id);
         }

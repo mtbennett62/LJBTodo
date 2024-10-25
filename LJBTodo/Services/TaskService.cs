@@ -36,9 +36,9 @@ namespace LJBTodo.Services
             }
         }
 
-        public async Task<bool> DeleteTask(long taskId)
+        public async Task DeleteTask(long taskId)
         {
-            throw new NotImplementedException();
+            await _todoRepository.DeleteAsync(taskId, true);
         }
 
         public async Task<IEnumerable<TodoItem>> GetAllTasksForUser(Guid userId)
@@ -52,12 +52,12 @@ namespace LJBTodo.Services
 
         public async Task<TodoItem> GetTaskById(long taskId)
         {
-            throw new NotImplementedException();
+            return await _todoRepository.GetByIdAsync(taskId);
         }
 
-        public async Task<TodoItem> UpdateTask(TodoItem task)
+        public TodoItem UpdateTask(TodoItem task)
         {
-            throw new NotImplementedException();
+            return _todoRepository.UpdateAsync(task, true);
         }
     }
 }
