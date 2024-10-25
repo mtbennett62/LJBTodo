@@ -23,12 +23,12 @@ namespace LJBTodo.Services
             if (typeof(T) == typeof(TodoItem))
             {
                 var todoTask = task as TodoItem;
-                return await _todoRepository.CreateAsync(todoTask) as T;
+                return await _todoRepository.CreateAsync(todoTask, true) as T;
             }
             else if (typeof(T) == typeof(RepeatTaskTemplate))
             {
                 var repeatTask = task as RepeatTaskTemplate;
-                return await _repeatTaskTemplateRepository.CreateAsync(repeatTask) as T;
+                return await _repeatTaskTemplateRepository.CreateAsync(repeatTask, true) as T;
             }
             else
             {

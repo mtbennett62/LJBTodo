@@ -2,7 +2,6 @@
 using LJBTodo.Models;
 using LJBTodo.Models.Tasks;
 using LJBTodo.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -211,10 +210,21 @@ public class TodoController : ControllerBase
     [HttpPost("repeatTask")]
     public async Task<ActionResult<RepeatTaskTemplate>> PostRepeatTask(RepeatTaskTemplate repeatTask)
     {
-        _context.RepeatTaskTemplates.Add(repeatTask);
-        await _context.SaveChangesAsync();
+        if (repeatTask.PriorityId == 0)
+        {
+            repeatTask.PriorityId = repeatTask.Priority != null ? repeatTask.Priority.Id : 1;
+        }
 
-        return CreatedAtAction(nameof(GetRepeatTasks), new { id = repeatTask.Id }, repeatTask);
+        var userId = _userManager.GetUserId(this.User);
+
+        if (Guid.TryParse(userId, out Guid userGuid))
+        {
+            repeatTask.UserGuid = userGuid;
+        }
+
+        var newItem = await _taskService.CreateTask(repeatTask);
+
+        return CreatedAtAction(nameof(GetRepeatTask), new { id = newItem.Id }, newItem);
     }
 
     [HttpPut("repeatTask/{id}")]
@@ -229,5 +239,34 @@ public class TodoController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpDelete("repeatTask/{id}")]
+    public async Task<IActionResult> DeleteRepeatTask(long id)
+    {
+        var repeatTask = await _context.RepeatTaskTemplates.FindAsync(id);
+
+        if (repeatTask == null)
+        {
+            return NotFound();
+        }
+
+        _context.RepeatTaskTemplates.Remove(repeatTask);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    [HttpGet("repeatTask/{id}")]
+    public async Task<ActionResult<RepeatTaskTemplate>> GetRepeatTask(long id)
+    {
+        var repeatTask = await _context.RepeatTaskTemplates.FindAsync(id);
+
+        if (repeatTask == null)
+        {
+            return NotFound();
+        }
+
+        return repeatTask;
     }
 }

@@ -26,5 +26,6 @@ namespace LJBTodo.Data
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Space> Spaces { get; set; }
         public DbSet<Tool> Tools { get; set; }
+        public DbSet<TaskSession> TaskSessions { get; set; }
     }
 }

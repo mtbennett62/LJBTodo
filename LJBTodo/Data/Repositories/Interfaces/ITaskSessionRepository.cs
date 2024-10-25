@@ -1,0 +1,12 @@
+﻿using LJBTodo.Models.Tasks;
+
+namespace LJBTodo.Data.Repositories.Interfaces
+{
+    public interface ITaskSessionRepository : IRepository<TaskSession>
+    {
+        Task<IEnumerable<TaskSession>> GetTaskSessionsForUser(Guid userGuid);
+        Task AddTasksToSession(long taskSessionId, IEnumerable<long> taskIds);
+    }
+
+
+}

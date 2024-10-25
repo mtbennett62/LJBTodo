@@ -21,6 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 // Add TaskService dependency injection
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
+builder.Services.AddScoped<ITaskSessionRepository, TaskSessionRepository>();
 
 builder.Services.AddScoped<ITaskService, TaskService>();
 
