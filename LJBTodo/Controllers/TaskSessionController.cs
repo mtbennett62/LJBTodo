@@ -1,4 +1,5 @@
-﻿using LJBTodo.Models.Tasks;
+﻿using LJBTodo.Models.DTOs;
+using LJBTodo.Models.Tasks;
 using LJBTodo.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -39,6 +40,7 @@ namespace LJBTodo.Controllers
             }
         }
 
+
         [HttpGet("{id}")]
         public async Task<ActionResult<TaskSession>> GetTaskSession(long id)
         {
@@ -49,6 +51,12 @@ namespace LJBTodo.Controllers
         [HttpPost]
         public async Task<ActionResult<TaskSession>> PostTaskSession(TaskSession taskSession)
         {
+            ClaimsPrincipal user = this.User;
+            var userId = _userManager.GetUserId(user);
+            var userGuid = Guid.Parse(userId);
+
+            taskSession.UserGuid = userGuid;
+
             var newTaskSession = await _taskSessionService.CreateTaskSession(taskSession);
             return Ok(newTaskSession);
         }
@@ -67,10 +75,10 @@ namespace LJBTodo.Controllers
             return Ok();
         }
 
-        [HttpPost("addtasks")]
-        public async Task<ActionResult> AddTasksToSession(long taskSessionId, IEnumerable<long> taskIds)
+        [HttpPost("updatetasks")]
+        public async Task<ActionResult> UpdateTasksForSession(UpdateSessionTasksDTO updateSessionTasksDTO)
         {
-            await _taskSessionService.AddTasksToSession(taskSessionId, taskIds);
+            await _taskSessionService.UpdateTasksForSession(updateSessionTasksDTO.TaskSessionId, updateSessionTasksDTO.AddedTaskIds, updateSessionTasksDTO.RemovedTaskIds);
             return Ok();
         }
 

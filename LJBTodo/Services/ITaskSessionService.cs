@@ -9,6 +9,6 @@ namespace LJBTodo.Services
         Task<TaskSession> CreateTaskSession(TaskSession taskSession);
         Task<TaskSession> UpdateTaskSession(TaskSession taskSession);
         Task DeleteTaskSession(long taskSessionId);
-        Task AddTasksToSession(long taskSessionId, IEnumerable<long> taskIds);
+        Task UpdateTasksForSession(long taskSessionId, IEnumerable<long> addedTaskIds, IEnumerable<long> removedTaskIds);
     }
 }

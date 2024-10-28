@@ -1,21 +1,8 @@
-import { Category } from "./category";
 import { Frequency } from "./enums/frequency";
-import { Priority } from "./priority";
+import { TaskBase } from "./todo";
 
-export type RepeatTaskTemplate = {
-    id: number;
-    userGuid: string;
-    name: string;
-    description?: string;
-    estimatedHours?: number;
-    categoryId?: number;
-    category?: Category;
-    comments?: Comment[];
-    priorityId: number;
-    priority?: Priority;
-    escalations?: any[];
-
+export interface RepeatTaskTemplate extends TaskBase {
     customFrequencyDays: number | undefined;
     frequency: Frequency;
-    mostRecentCompletion: Date;
+    mostRecentCompletion: Date | undefined;
 }

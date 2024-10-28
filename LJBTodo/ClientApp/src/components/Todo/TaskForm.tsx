@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../provider/authProvider";
-import { TodoItem } from "../../types/todo";
+import { TaskBase, TodoItem } from "../../types/todo";
 import axios from "axios";
 
 import * as Dialog from "@radix-ui/react-dialog";
@@ -8,23 +8,28 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
+import { RepeatTaskTemplate } from "../../types/repeatTaskTemplate";
+import TaskItem from "./TaskItem";
 
 
 
-type TaskFormProps = {
-    todo: TodoItem;
+type TaskFormProps<T extends TaskBase> = {
+    todo: T;
     isEdit: boolean;
-    handleTaskSave: (task: TodoItem, isUpdate: boolean) => void;
-}
+    handleTaskSave: (task: T, isUpdate: boolean) => void;
+};
 
-const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
+const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskFormProps<T>) => {
 
     const { priorities } = useSelector((state: RootState) => state.priority);
 
     const { getConfig } = useAuth();
     const { categories } = useSelector((state: RootState) => state.category);
 
-    const [taskItem, setTaskItem] = useState<TodoItem>({ ...todo });
+    const [taskItem, setTaskItem] = useState<T>({ ...todo });
+
+    const isRepeatTask = !('dueDate' in todo);
+    const endpoint = isRepeatTask ? 'todo/repeatTask' : 'todo';
 
     function handleTaskNameChange(e: any) {
         setTaskItem({
@@ -42,13 +47,13 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
 
     function save() {
         if (isEdit) {
-            axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${taskItem.id}`, taskItem, getConfig())
+            axios.put(`${import.meta.env.VITE_API_URL}/api/${endpoint}/${taskItem.id}`, taskItem, getConfig())
                 .then(() => {
                     handleTaskSave(taskItem, true);
                 })
                 .catch(error => console.error('There was an error!', error));
         } else {
-            axios.post(`${import.meta.env.VITE_API_URL}/api/todo`, taskItem, getConfig())
+            axios.post(`${import.meta.env.VITE_API_URL}/api/${endpoint}`, taskItem, getConfig())
                 .then((response) => {
                     handleTaskSave(response.data, false);
                 })
@@ -88,10 +93,12 @@ const TaskForm = ({ todo, isEdit, handleTaskSave }: TaskFormProps) => {
                         ))}
                     </select>
                 </fieldset>
-                <fieldset className="date-input">
-                    <label className="Label" htmlFor="dueDate">Due Date</label>
-                    <DatePicker className="Input" selected={taskItem.dueDate} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
-                </fieldset>
+                {!isRepeatTask &&
+                    <fieldset className="date-input">
+                        <label className="Label" htmlFor="dueDate">Due Date</label>
+                        <DatePicker className="Input" selected={(taskItem as unknown as TodoItem).dueDate ?? new Date()} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                    </fieldset>
+                }
                 <fieldset className="Fieldset">
                     <label className="Label" htmlFor="description">Description</label>
                     <textarea

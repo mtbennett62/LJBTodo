@@ -4,6 +4,7 @@ using LJBTodo.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LJBTodo.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241025164914_AddTaskSessions")]
+    partial class AddTaskSessions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,9 +297,6 @@ namespace LJBTodo.Data.Migrations
                     b.Property<long?>("RepeatTaskTemplateId")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("TaskSessionId")
-                        .HasColumnType("bigint");
-
                     b.Property<Guid>("UserGuid")
                         .HasColumnType("uniqueidentifier");
 
@@ -308,8 +307,6 @@ namespace LJBTodo.Data.Migrations
                     b.HasIndex("PriorityId");
 
                     b.HasIndex("RepeatTaskTemplateId");
-
-                    b.HasIndex("TaskSessionId");
 
                     b.ToTable("TodoItems");
                 });
@@ -518,6 +515,21 @@ namespace LJBTodo.Data.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("TaskSessionTodoItem", b =>
+                {
+                    b.Property<long>("TaskSessionsId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("TodoItemsId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("TaskSessionsId", "TodoItemsId");
+
+                    b.HasIndex("TodoItemsId");
+
+                    b.ToTable("TaskSessionTodoItem");
+                });
+
             modelBuilder.Entity("LJBTodo.Models.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
@@ -625,10 +637,6 @@ namespace LJBTodo.Data.Migrations
                         .WithMany("TodoItems")
                         .HasForeignKey("RepeatTaskTemplateId");
 
-                    b.HasOne("LJBTodo.Models.Tasks.TaskSession", null)
-                        .WithMany("TodoItems")
-                        .HasForeignKey("TaskSessionId");
-
                     b.Navigation("Category");
 
                     b.Navigation("Priority");
@@ -685,6 +693,21 @@ namespace LJBTodo.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("TaskSessionTodoItem", b =>
+                {
+                    b.HasOne("LJBTodo.Models.Tasks.TaskSession", null)
+                        .WithMany()
+                        .HasForeignKey("TaskSessionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LJBTodo.Models.Tasks.TodoItem", null)
+                        .WithMany()
+                        .HasForeignKey("TodoItemsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("LJBTodo.Models.ApplicationUser", b =>
                 {
                     b.HasOne("LJBTodo.Models.Tasks.RepeatTaskTemplate", null)
@@ -714,11 +737,6 @@ namespace LJBTodo.Data.Migrations
 
                     b.Navigation("IncludedUsers");
 
-                    b.Navigation("TodoItems");
-                });
-
-            modelBuilder.Entity("LJBTodo.Models.Tasks.TaskSession", b =>
-                {
                     b.Navigation("TodoItems");
                 });
 

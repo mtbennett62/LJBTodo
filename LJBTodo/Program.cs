@@ -24,6 +24,7 @@ builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITaskSessionRepository, TaskSessionRepository>();
 
 builder.Services.AddScoped<ITaskService, TaskService>();
+builder.Services.AddScoped<ITaskSessionService, TaskSessionService>();
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>

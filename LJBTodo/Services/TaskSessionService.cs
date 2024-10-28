@@ -12,9 +12,9 @@ namespace LJBTodo.Services
             _taskSessionRepository = taskSessionRepository;
         }
 
-        public async Task AddTasksToSession(long taskSessionId, IEnumerable<long> taskIds)
+        public async Task UpdateTasksForSession(long taskSessionId, IEnumerable<long> addedTaskIds, IEnumerable<long> removedTaskIds)
         {
-            await _taskSessionRepository.AddTasksToSession(taskSessionId, taskIds);
+            await _taskSessionRepository.UpdateTasksForSession(taskSessionId, addedTaskIds, removedTaskIds);
         }
 
         public async Task<TaskSession> CreateTaskSession(TaskSession taskSession)
@@ -32,9 +32,9 @@ namespace LJBTodo.Services
             return await _taskSessionRepository.GetByIdAsync((int)taskSessionId);
         }
 
-        public Task<IEnumerable<TaskSession>> GetTaskSessionsForUser(Guid userId)
+        public async Task<IEnumerable<TaskSession>> GetTaskSessionsForUser(Guid userId)
         {
-            throw new NotImplementedException();
+            return await _taskSessionRepository.GetTaskSessionsForUser(userId);
         }
 
         public Task<TaskSession> UpdateTaskSession(TaskSession taskSession)
