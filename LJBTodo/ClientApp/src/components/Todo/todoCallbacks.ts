@@ -31,7 +31,10 @@ export const useTodoCallbacks = () => {
     const handleDueDateChange = useCallback((task: TodoItem, e: any) => {
         const updatedTodo = { ...task, dueDate: e };
         axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${task.id}`, updatedTodo, getConfig())
-            .then(() => dispatch(updateTodo(updatedTodo)))
+            .then(() => {
+                dispatch(updateTodo(updatedTodo))
+                dispatch(updateTaskInSession(updatedTodo));
+            })
             .catch(error => console.error('There was an error!', error));
     }, [todos]);
 
@@ -41,6 +44,7 @@ export const useTodoCallbacks = () => {
         } else {
             dispatch(addTodo(task));
         }
+        dispatch(updateTaskInSession(task));
     }, [todos]);
 
     return {

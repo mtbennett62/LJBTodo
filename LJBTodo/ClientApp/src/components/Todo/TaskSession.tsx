@@ -9,7 +9,7 @@ import { addTasksToSession, removeTasksFromSession, setTaskSessions } from "../.
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Form from "@radix-ui/react-form";
 import * as Popover from "@radix-ui/react-popover";
-import { Box, Button, Flex, Section, Checkbox } from "@radix-ui/themes";
+import { Box, Button, Flex, Section, Checkbox, Text, Progress } from "@radix-ui/themes";
 import "../radix-components.scss";
 import TaskItem from "./TaskItem";
 import { useTodoCallbacks } from "./todoCallbacks";
@@ -29,7 +29,7 @@ const TaskSessions = () => {
 
     }, [taskSessionsLoaded]);
 
-    useEffect(() => {}, [taskSessions]);
+    useEffect(() => { }, [taskSessions]);
 
 
     const addTaskSession = (formData: FormData) => {
@@ -45,7 +45,47 @@ const TaskSessions = () => {
             });
     };
 
+    const dateDisplay = (startDate: Date, endDate: Date) => {
+        const extendedOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'short', day: '2-digit' };
+        const options: Intl.DateTimeFormatOptions = { weekday: 'long' };
 
+        if (startDate && endDate && startDate.setHours(0, 0, 0, 0) - endDate.setHours(0, 0, 0, 0) !== 0) {
+            const intlFormatter = new Intl.DateTimeFormat('en-GB', extendedOptions);
+            return `${intlFormatter.format(startDate)} - ${intlFormatter.format(endDate)}`;
+        }
+
+        const now = new Date();
+        const diffInDays = Math.floor((startDate.setHours(0, 0, 0, 0) - now.setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24));
+
+        if (diffInDays === 0) return "Today";
+        if (diffInDays === 1) return "Tomorrow";
+        if (diffInDays === -1) return "Yesterday";
+
+        const dayOfWeek = new Intl.DateTimeFormat('en-GB', options).format(startDate);
+
+        const getWeekNumber = (date: Date) => {
+            const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+            const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+            return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+        };
+
+        const nowWeekNumber = getWeekNumber(now);
+        const dateWeekNumber = getWeekNumber(startDate);
+
+        let dateString;
+        if (nowWeekNumber === dateWeekNumber) dateString = dayOfWeek;
+        else if (dateWeekNumber - nowWeekNumber === 1) dateString = `Next ${dayOfWeek}`;
+        else if (dateWeekNumber - nowWeekNumber === -1) dateString = `Last ${dayOfWeek}`;
+        else dateString = new Intl.DateTimeFormat('en-GB', extendedOptions).format(startDate);
+
+        return dateString;
+    };
+
+    const getProgressByTasks = (taskSession: TaskSession) => {
+        if (taskSession.todoItems.length === 0) return 0;
+        const completedTasks = taskSession.todoItems.filter(task => task.isComplete);
+        return (completedTasks.length / taskSession.todoItems.length) * 100;
+    };
 
     return (
         <>
@@ -53,9 +93,17 @@ const TaskSessions = () => {
             <Accordion.Root type="multiple">
                 {taskSessions.map((taskSession: TaskSession) => (
                     <Accordion.Item className="TaskSessionAccordion Item" key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
-                        <Accordion.Trigger>{taskSession.startDate.toString()}</Accordion.Trigger>
+                        <Accordion.Trigger>
+                            <Flex gap="3">
+                                <Text>{dateDisplay(new Date(taskSession.startDate), new Date(taskSession.endDate))} </Text>
+                                <Text> {taskSession.todoItems.length} {taskSession.todoItems.length == 1 ? 'task' : 'tasks'}</Text>
+                                <Text>Total Estimated Hours: {taskSession.todoItems.reduce((sum, item) => sum + (item.estimatedHours || 0), 0)}</Text>
+                            </Flex>
+
+                        </Accordion.Trigger>
                         <AddTasksPopover taskSession={taskSession} />
                         <Accordion.Content className="TaskSessionAccordion Content">
+                            {taskSession.todoItems.length && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
                             <TaskSessionItem taskSession={taskSession} />
                         </Accordion.Content>
                     </ Accordion.Item>
@@ -67,7 +115,6 @@ const TaskSessions = () => {
                             onSubmit={(event) => {
                                 event.preventDefault();
                                 const formData = new FormData(event.currentTarget);
-                                console.log("form data", formData);
                                 addTaskSession(formData);
                             }}
                         >
@@ -100,12 +147,12 @@ const TaskSessions = () => {
 const TaskSessionItem = ({ taskSession }: { taskSession: TaskSession }) => {
     const { handleTaskSave, deleteTodoItem, handleDueDateChange, toggleComplete } = useTodoCallbacks();
 
-useEffect(() => {}, [taskSession.todoItems]);
+    useEffect(() => { }, [taskSession.todoItems]);
 
     return (
         <Box className="TaskSessionItem">
-            
-            {taskSession.todoItems.map((todoItem: TodoItem) => (
+
+            {taskSession.todoItems.toSorted((a, b) => Number(a.isComplete) - Number(b.isComplete)).map((todoItem: TodoItem) => (
                 <TaskItem key={`session-${taskSession.id}-task-${todoItem.id}`} todo={todoItem} deleteTodo={deleteTodoItem} handleDueDateChange={handleDueDateChange} handleTaskSave={handleTaskSave} toggleComplete={toggleComplete} />
             ))}
         </Box>
@@ -114,28 +161,25 @@ useEffect(() => {}, [taskSession.todoItems]);
 
 const AddTasksPopover = ({ taskSession }: { taskSession: TaskSession }) => {
     return (
-<Popover.Root modal>
-                <Popover.Trigger>
-                    <Button size="1" variant="soft">Add tasks</Button>
-                </Popover.Trigger>
-                <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
+        <Popover.Root modal>
+            <Popover.Trigger>
+                <Button size="1" variant="soft">Add tasks</Button>
+            </Popover.Trigger>
+            <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
 
-                    <Popover.Content className="PopoverContent">
-                        <TaskSessionTaskList taskSession={taskSession} />
-                    </Popover.Content>
-                </Popover.Portal>
-            </Popover.Root>
-)};
+                <Popover.Content className="PopoverContent">
+                    <TaskSessionTaskList taskSession={taskSession} />
+                </Popover.Content>
+            </Popover.Portal>
+        </Popover.Root>
+    )
+};
 
 
 const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
     const { todos } = useSelector((state: RootState) => state.todo);
     const { getConfig } = useAuth();
     const dispatch = useDispatch();
-
-
-    console.log("task session", taskSession);
-
 
     const [selectableTodos, setSelectableTodos] = useState<TodoItem[]>([]);
     const [addedTaskIds, setAddedIds] = useState<number[]>([]);
@@ -167,8 +211,6 @@ const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
     const handleSave = () => {
         axios.post(`${import.meta.env.VITE_API_URL}/api/taskSession/updatetasks`, { taskSessionId: taskSession.id, addedTaskIds, removedTaskIds }, getConfig())
             .then(() => {
-                console.log("added", addedTaskIds);
-                console.log("removed", removedTaskIds);
 
                 const todosToAdd = todos.filter(todo => addedTaskIds.includes(todo.id));
 
@@ -176,12 +218,6 @@ const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
                 dispatch(removeTasksFromSession(taskSession.id, removedTaskIds));
                 setAddedIds([]);
                 setRemovedIds([]);
-
-                //TODO: update task session in redux and make sure it gets reflected in the ui
-                
-
-                console.log("task session", taskSession);
-                console.log("task session todo items", taskSession.todoItems);
             });
 
     };
