@@ -1,8 +1,8 @@
 import { TodoItem } from "../../types/todo";
 // import * as Checkbox from "@radix-ui/react-checkbox";
-import { Badge, Checkbox } from "@radix-ui/themes";
+import { Badge, Button, Checkbox } from "@radix-ui/themes";
 import DatePicker from "react-datepicker";
-import { CheckIcon, TrashIcon } from "@radix-ui/react-icons";
+import { TrashIcon } from "@radix-ui/react-icons";
 import * as Dialog from "@radix-ui/react-dialog";
 import TaskForm from "./TaskForm";
 import { Category } from "../../types/category";
@@ -71,7 +71,7 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
                     {todo.priority && <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>}
                     <DatePicker className="Input" placeholderText="Add due date" selected={todo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
                     <Checkbox size="3" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)} /> 
-                    <button onClick={() => deleteTodo(todo.id)}><TrashIcon /></button>
+                    <Button onClick={() => deleteTodo(todo.id)}><TrashIcon /></Button>
                 </div>
             </div>
 

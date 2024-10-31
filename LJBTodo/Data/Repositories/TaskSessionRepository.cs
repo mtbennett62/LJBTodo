@@ -25,16 +25,15 @@ namespace LJBTodo.Data.Repositories
 
             foreach (var id in addedTaskIds)
             {
+                if (taskSession.TodoItems.Any(x => x.Id == id)) break;
                 var todo = new TodoItem { Id = id };
                 _context.Attach(todo);
                 taskSession.TodoItems.Add(todo);
             }
 
-            foreach (var id in removedTaskIds)
+            if (removedTaskIds.Any())
             {
-                var todo = new TodoItem { Id = id };
-                _context.Attach(todo);
-                taskSession.TodoItems.Remove(todo);
+                taskSession.TodoItems.RemoveAll(x => removedTaskIds.Contains(x.Id));
             }
 
             await _context.SaveChangesAsync();

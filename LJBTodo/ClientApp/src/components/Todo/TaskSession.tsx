@@ -11,6 +11,8 @@ import * as Form from "@radix-ui/react-form";
 import * as Popover from "@radix-ui/react-popover";
 import { Box, Button, Flex, Section, Checkbox } from "@radix-ui/themes";
 import "../radix-components.scss";
+import TaskItem from "./TaskItem";
+import { useTodoCallbacks } from "./todoCallbacks";
 
 const TaskSessions = () => {
     const { taskSessions, taskSessionsLoaded } = useSelector((state: RootState) => state.session);
@@ -26,6 +28,8 @@ const TaskSessions = () => {
         });
 
     }, [taskSessionsLoaded]);
+
+    useEffect(() => {}, [taskSessions]);
 
 
     const addTaskSession = (formData: FormData) => {
@@ -48,9 +52,10 @@ const TaskSessions = () => {
 
             <Accordion.Root type="multiple">
                 {taskSessions.map((taskSession: TaskSession) => (
-                    <Accordion.Item key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
+                    <Accordion.Item className="TaskSessionAccordion Item" key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
                         <Accordion.Trigger>{taskSession.startDate.toString()}</Accordion.Trigger>
-                        <Accordion.Content>
+                        <AddTasksPopover taskSession={taskSession} />
+                        <Accordion.Content className="TaskSessionAccordion Content">
                             <TaskSessionItem taskSession={taskSession} />
                         </Accordion.Content>
                     </ Accordion.Item>
@@ -93,28 +98,34 @@ const TaskSessions = () => {
 };
 
 const TaskSessionItem = ({ taskSession }: { taskSession: TaskSession }) => {
+    const { handleTaskSave, deleteTodoItem, handleDueDateChange, toggleComplete } = useTodoCallbacks();
+
+useEffect(() => {}, [taskSession.todoItems]);
 
     return (
-        <div>
-            <Popover.Root modal>
-                <Popover.Trigger>
-                    <Button>Add tasks</Button>
-                </Popover.Trigger>
-                        <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
-
-                <Popover.Content className="PopoverContent">
-                        <TaskSessionTaskList taskSession={taskSession} />
-                </Popover.Content>
-                        </Popover.Portal>
-            </Popover.Root>
-            <ul>
-                {taskSession.todoItems.map((todoItem: TodoItem) => (
-                    <li key={todoItem.id}>{todoItem.name}</li>
-                ))}
-            </ul>
-        </div>
+        <Box className="TaskSessionItem">
+            
+            {taskSession.todoItems.map((todoItem: TodoItem) => (
+                <TaskItem key={`session-${taskSession.id}-task-${todoItem.id}`} todo={todoItem} deleteTodo={deleteTodoItem} handleDueDateChange={handleDueDateChange} handleTaskSave={handleTaskSave} toggleComplete={toggleComplete} />
+            ))}
+        </Box>
     );
 };
+
+const AddTasksPopover = ({ taskSession }: { taskSession: TaskSession }) => {
+    return (
+<Popover.Root modal>
+                <Popover.Trigger>
+                    <Button size="1" variant="soft">Add tasks</Button>
+                </Popover.Trigger>
+                <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
+
+                    <Popover.Content className="PopoverContent">
+                        <TaskSessionTaskList taskSession={taskSession} />
+                    </Popover.Content>
+                </Popover.Portal>
+            </Popover.Root>
+)};
 
 
 const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
@@ -156,10 +167,21 @@ const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
     const handleSave = () => {
         axios.post(`${import.meta.env.VITE_API_URL}/api/taskSession/updatetasks`, { taskSessionId: taskSession.id, addedTaskIds, removedTaskIds }, getConfig())
             .then(() => {
-                dispatch(addTasksToSession(taskSession.id, addedTaskIds));
+                console.log("added", addedTaskIds);
+                console.log("removed", removedTaskIds);
+
+                const todosToAdd = todos.filter(todo => addedTaskIds.includes(todo.id));
+
+                dispatch(addTasksToSession(taskSession.id, todosToAdd));
                 dispatch(removeTasksFromSession(taskSession.id, removedTaskIds));
                 setAddedIds([]);
                 setRemovedIds([]);
+
+                //TODO: update task session in redux and make sure it gets reflected in the ui
+                
+
+                console.log("task session", taskSession);
+                console.log("task session todo items", taskSession.todoItems);
             });
 
     };
@@ -171,19 +193,20 @@ const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
     return (
         <Flex gap="3">
             <ul className="taskSessionList">
-                {selectableTodos.map((todoItem: TodoItem) => (
-                    <Box key={`task-${todoItem.id}`}>
-                        <Flex gap="1">
+                {
+                    selectableTodos.map((todoItem: TodoItem) => (
+                        <Box key={`task-${todoItem.id}`}>
+                            <Flex gap="1">
 
-                            <Checkbox color="orange" checked={isChecked(todoItem.id)}
-                                onCheckedChange={(event) => {
-                                    handleCheckedChange(event as boolean, todoItem.id);
-                                }} />
-                            <li key={todoItem.id}>{todoItem.name}</li>
-                        </Flex>
+                                <Checkbox color="orange" checked={isChecked(todoItem.id)}
+                                    onCheckedChange={(event) => {
+                                        handleCheckedChange(event as boolean, todoItem.id);
+                                    }} />
+                                <li key={todoItem.id}>{todoItem.name}</li>
+                            </Flex>
 
-                    </Box>
-                ))}
+                        </Box>
+                    ))}
                 <Section>
                     <Button onClick={handleSave}>Save</Button>
                 </Section>
