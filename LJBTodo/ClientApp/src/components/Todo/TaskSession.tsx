@@ -220,26 +220,26 @@ const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
     }
 
     return (
-        <Flex gap="3">
-            <ul className="taskSessionList">
+        <Flex>
+            <Flex gap="3" direction="column" className="taskSessionList">
                 {
                     selectableTodos.map((todoItem: TodoItem) => (
                         <Box key={`task-${todoItem.id}`}>
-                            <Flex gap="1">
+                            <Flex align="center" gap="2">
 
-                                <Checkbox color="orange" checked={isChecked(todoItem.id)}
+                                <Checkbox color="violet" checked={isChecked(todoItem.id)}
                                     onCheckedChange={(event) => {
                                         handleCheckedChange(event as boolean, todoItem.id);
                                     }} />
-                                <li key={todoItem.id}>{todoItem.name}</li>
+                                <Text align="left" key={todoItem.id}>{todoItem.name}</Text>
                             </Flex>
 
                         </Box>
                     ))}
-                <Section>
-                    <Button onClick={handleSave}>Save</Button>
-                </Section>
-            </ul>
+                <Box>
+                    <Button color="violet" onClick={handleSave}>Save</Button>
+                </Box>
+            </Flex>
         </Flex>
     );
 };

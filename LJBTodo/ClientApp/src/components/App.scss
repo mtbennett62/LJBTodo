@@ -52,6 +52,11 @@ ul, li {
   list-style: none;
 }
 
-ul.taskSessionList {
+fieldset{
+  display: flex;
+  justify-content: space-between;
+
+  border: none;
   padding: unset;
 }
+

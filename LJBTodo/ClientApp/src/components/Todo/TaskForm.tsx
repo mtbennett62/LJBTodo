@@ -8,6 +8,7 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
+import { Flex } from "@radix-ui/themes";
 
 type TaskFormProps<T extends TaskBase> = {
     todo: T;
@@ -58,63 +59,65 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
     }
 
     return (
-        <Dialog.Portal>
+        <Dialog.Portal container={document.getElementsByClassName('radix-themes')[0]}>
             <Dialog.Overlay className="DialogOverlay" />
             <Dialog.Content className="DialogContent" aria-description="task form">
                 <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
                 <Dialog.Description className="DialogDescription">Please fill in the details below</Dialog.Description>
-                <fieldset className="Fieldset">
-                    <label className="Label" htmlFor="description">Description</label>
-                    <input
-                        id="description"
-                        className="Input"
-                        type="text"
-                        value={taskItem.name}
-                        onChange={handleTaskNameChange}
-                    />
-                </fieldset>
-                <fieldset className="Fieldset">
-                    <label className="Label" htmlFor="priority">Priority</label>
-                    <select id="priority" className="Select Input" value={taskItem.priorityId} onChange={handleTaskPriorityChange}>
-                        {priorities.length > 0 && priorities.map(priority => (
-                            <option key={priority.id} value={priority.id}>{priority.name}</option>
-                        ))}
-                    </select>
-                </fieldset>
-                <fieldset className="Fieldset">
-                    <label className="Label" htmlFor="category">Category</label>
-                    <select id="category" className="Select Input" value={taskItem.categoryId} onChange={(e: any) => setTaskItem({ ...taskItem, categoryId: e.target.value })}>
-                        {categories.length > 0 && categories.map(category => (
-                            <option key={category.id} value={category.id}>{category.name}</option>
-                        ))}
-                    </select>
-                </fieldset>
-                {!isRepeatTask &&
-                    <fieldset className="date-input">
-                        <label className="Label" htmlFor="dueDate">Due Date</label>
-                        <DatePicker className="Input" selected={(taskItem as unknown as TodoItem).dueDate ?? new Date()} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                <Flex gap="2" direction="column">
+                    <fieldset>
+                        <label className="Label" htmlFor="description">Description</label>
+                        <input
+                            id="description"
+                            className="Input"
+                            type="text"
+                            value={taskItem.name}
+                            onChange={handleTaskNameChange}
+                        />
                     </fieldset>
-                }
-                <fieldset className="Fieldset">
-                    <label className="Label" htmlFor="description">Description</label>
-                    <textarea
-                        placeholder="Add description"
-                        id="description"
-                        className="Input"
-                        defaultValue={taskItem.description}
-                        onChange={(e: any) => setTaskItem({ ...taskItem, description: e.target.value })}
-                    />
-                </fieldset>
-                <fieldset className="Fieldset">
-                    <label className="Label" htmlFor="estimatedHours">Estimated Hours</label>
-                    <input
-                        placeholder="Add estimate"
-                        id="estimatedHours"
-                        className="Input"
-                        type="number"
-                        defaultValue={taskItem.estimatedHours}
-                        onChange={(e: any) => e.target.value && setTaskItem({ ...taskItem, estimatedHours: e.target.value })} />
-                </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="priority">Priority</label>
+                        <select id="priority" className="Select Input" value={taskItem.priorityId} onChange={handleTaskPriorityChange}>
+                            {priorities.length > 0 && priorities.map(priority => (
+                                <option key={priority.id} value={priority.id}>{priority.name}</option>
+                            ))}
+                        </select>
+                    </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="category">Category</label>
+                        <select id="category" className="Select Input" value={taskItem.categoryId} onChange={(e: any) => setTaskItem({ ...taskItem, categoryId: e.target.value })}>
+                            {categories.length > 0 && categories.map(category => (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                            ))}
+                        </select>
+                    </fieldset>
+                    {!isRepeatTask &&
+                        <fieldset className="date-input">
+                            <label className="Label" htmlFor="dueDate">Due Date</label>
+                            <DatePicker className="Input" selected={(taskItem as unknown as TodoItem).dueDate ?? new Date()} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                        </fieldset>
+                    }
+                    <fieldset>
+                        <label className="Label" htmlFor="description">Description</label>
+                        <textarea
+                            placeholder="Add description"
+                            id="description"
+                            className="Input"
+                            defaultValue={taskItem.description}
+                            onChange={(e: any) => setTaskItem({ ...taskItem, description: e.target.value })}
+                        />
+                    </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="estimatedHours">Estimated Hours</label>
+                        <input
+                            placeholder="Add estimate"
+                            id="estimatedHours"
+                            className="Input"
+                            type="number"
+                            defaultValue={taskItem.estimatedHours}
+                            onChange={(e: any) => e.target.value && setTaskItem({ ...taskItem, estimatedHours: e.target.value })} />
+                    </fieldset>
+                </Flex>
                 <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
                     <Dialog.Close asChild>
                         <button className="Button green" onClick={save}>Save</button>
