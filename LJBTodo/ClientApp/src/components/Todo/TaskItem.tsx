@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { Priority } from "../../types/priority";
 import { updateTodo } from "../../redux/todoActions";
 import TaskComments from "./TaskComments";
+import ConfirmDialogButton from "../Shared/ConfirmDialogButton";
 
 
 type TaskItemProps = {
@@ -71,7 +72,8 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
                     {todo.priority && <Badge className="priority" style={{ backgroundColor: todo.priority?.colourCode }}>{todo.priority?.name}</Badge>}
                     <DatePicker className="Input" placeholderText="Add due date" selected={todo.dueDate} onChange={(date: any) => handleDueDateChange(todo, date)} />
                     <Checkbox size="3" checked={todo.isComplete} onCheckedChange={() => toggleComplete(todo)} /> 
-                    <Button onClick={() => deleteTodo(todo.id)}><TrashIcon /></Button>
+                    <ConfirmDialogButton child={<Button variant="ghost" color="red"><TrashIcon /></Button>} confirmAction={() => deleteTodo(todo.id)}  
+                    confirmButtonText="Delete" title="Delete task?" confirmText="This action is not reversible"/>
                 </div>
             </div>
 

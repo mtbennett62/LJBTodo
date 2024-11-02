@@ -91,7 +91,7 @@ const TaskSessions = () => {
                                 </Flex>
                                 <Flex className="TaskOptions">
                                     <AddTasksPopover taskSession={taskSession} />
-                                    <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="Are you sure you want to delete this task session?" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
+                                    <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="This action is not reversible" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
                                 </Flex>
                         </Accordion.Trigger>
                         <Accordion.Content className="AccordionContent Content">
