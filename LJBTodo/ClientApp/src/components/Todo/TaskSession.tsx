@@ -10,14 +10,18 @@ import * as Accordion from "@radix-ui/react-accordion";
 import * as Form from "@radix-ui/react-form";
 import * as Popover from "@radix-ui/react-popover";
 import { Box, Button, Flex, Section, Checkbox, Text, Progress } from "@radix-ui/themes";
-import "../radix-components.scss";
+import '../radix-styles/radix-components.scss';
 import TaskItem from "./TaskItem";
 import { useTodoCallbacks } from "./todoCallbacks";
+import { useTaskSessionCallbacks } from "./taskSessionCallbacks";
+import { TrashIcon } from "@radix-ui/react-icons";
+import ConfirmDialogButton from "../Shared/ConfirmDialogButton";
 
 const TaskSessions = () => {
     const { taskSessions, taskSessionsLoaded } = useSelector((state: RootState) => state.session);
     const dispatch = useDispatch();
     const { getConfig } = useAuth();
+    const { addSession, deleteSession } = useTaskSessionCallbacks();
 
     useEffect(() => {
         if (taskSessionsLoaded) {
@@ -30,20 +34,6 @@ const TaskSessions = () => {
     }, [taskSessionsLoaded]);
 
     useEffect(() => { }, [taskSessions]);
-
-
-    const addTaskSession = (formData: FormData) => {
-        const newTaskSession: TaskSession = {
-            id: 0,
-            startDate: new Date(formData.get('start') as string),
-            endDate: new Date(formData.get('end') as string),
-            todoItems: []
-        };
-        axios.post(`${import.meta.env.VITE_API_URL}/api/taskSession`, newTaskSession, getConfig())
-            .then(response => {
-                dispatch(setTaskSessions([...taskSessions, response.data]));
-            });
-    };
 
     const dateDisplay = (startDate: Date, endDate: Date) => {
         const extendedOptions: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'short', day: '2-digit' };
@@ -88,34 +78,37 @@ const TaskSessions = () => {
     };
 
     return (
-        <>
-
-            <Accordion.Root type="multiple">
+        <Box className="TaskSessionContainer">
+            <Accordion.Root className="AccordionRoot" type="multiple">
                 {taskSessions.map((taskSession: TaskSession) => (
-                    <Accordion.Item className="TaskSessionAccordion Item" key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
-                        <Accordion.Trigger>
-                            <Flex gap="3">
-                                <Text>{dateDisplay(new Date(taskSession.startDate), new Date(taskSession.endDate))} </Text>
-                                <Text> {taskSession.todoItems.length} {taskSession.todoItems.length == 1 ? 'task' : 'tasks'}</Text>
-                                <Text>Total Estimated Hours: {taskSession.todoItems.reduce((sum, item) => sum + (item.estimatedHours || 0), 0)}</Text>
-                            </Flex>
-
+                    <Accordion.Item className="AccordionItem" key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
+                        <Accordion.Trigger className="AccordionTrigger">
+                                <Flex gap="3" className="SessionInfo">
+                                    <Text>{dateDisplay(new Date(taskSession.startDate), new Date(taskSession.endDate))} </Text>
+                                    <Text> {taskSession.todoItems.length} {taskSession.todoItems.length == 1 ? 'task' : 'tasks'}</Text>
+                                    <Text>Total Estimated Hours: {taskSession.todoItems.reduce((sum, item) => sum + (item.estimatedHours || 0), 0)}</Text>
+                                    {taskSession.todoItems.length > 0 && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
+                                </Flex>
+                                <Flex className="TaskOptions">
+                                    <AddTasksPopover taskSession={taskSession} />
+                                    <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="Are you sure you want to delete this task session?" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
+                                </Flex>
                         </Accordion.Trigger>
-                        <AddTasksPopover taskSession={taskSession} />
-                        <Accordion.Content className="TaskSessionAccordion Content">
-                            {taskSession.todoItems.length && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
-                            <TaskSessionItem taskSession={taskSession} />
+                        <Accordion.Content className="AccordionContent Content">
+                            <div className="TaskSessionContent">
+                                <TaskSessionItem taskSession={taskSession} />
+                            </div>
                         </Accordion.Content>
                     </ Accordion.Item>
                 ))}
-                <Accordion.Item value="new-taskSession">
-                    <Accordion.Trigger>Add New Task Session</Accordion.Trigger>
-                    <Accordion.Content>
+                <Accordion.Item className="AccordionItem new" value="new-taskSession">
+                    <Accordion.Trigger className="AccordionTrigger">Add New Task Session</Accordion.Trigger>
+                    <Accordion.Content className="AccordionContent">
                         <Form.Root
                             onSubmit={(event) => {
                                 event.preventDefault();
                                 const formData = new FormData(event.currentTarget);
-                                addTaskSession(formData);
+                                addSession(formData);
                             }}
                         >
                             <Form.Field name="start">
@@ -139,7 +132,7 @@ const TaskSessions = () => {
                     </Accordion.Content>
                 </Accordion.Item>
             </Accordion.Root>
-        </>
+        </Box>
     );
 
 };
@@ -161,17 +154,19 @@ const TaskSessionItem = ({ taskSession }: { taskSession: TaskSession }) => {
 
 const AddTasksPopover = ({ taskSession }: { taskSession: TaskSession }) => {
     return (
-        <Popover.Root modal>
-            <Popover.Trigger>
-                <Button size="1" variant="soft">Add tasks</Button>
-            </Popover.Trigger>
-            <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
+        <div onClick={(e) => e.preventDefault}>
+            <Popover.Root modal>
+                <Popover.Trigger>
+                    <Button size="1" variant="soft">Add tasks</Button>
+                </Popover.Trigger>
+                <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
 
-                <Popover.Content className="PopoverContent">
-                    <TaskSessionTaskList taskSession={taskSession} />
-                </Popover.Content>
-            </Popover.Portal>
-        </Popover.Root>
+                    <Popover.Content className="PopoverContent">
+                        <TaskSessionTaskList taskSession={taskSession} />
+                    </Popover.Content>
+                </Popover.Portal>
+            </Popover.Root>
+        </div>
     )
 };
 

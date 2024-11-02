@@ -38,5 +38,21 @@ namespace LJBTodo.Data.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteTaskSession(long taskSessionId)
+        {
+            var taskSession = await _context.TaskSessions.Include(x => x.TodoItems).FirstOrDefaultAsync(x => x.Id == taskSessionId);
+
+            if (taskSession == null) return;
+
+            if (taskSession.TodoItems.Any())
+            {
+                taskSession.TodoItems.Clear();
+            }
+
+            _context.TaskSessions.Remove(taskSession);
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

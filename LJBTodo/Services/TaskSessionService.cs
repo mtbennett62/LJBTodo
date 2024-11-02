@@ -24,7 +24,7 @@ namespace LJBTodo.Services
 
         public async Task DeleteTaskSession(long taskSessionId)
         {
-            await _taskSessionRepository.DeleteAsync((int)taskSessionId, true);
+            await _taskSessionRepository.DeleteTaskSession(taskSessionId);
         }
 
         public async Task<TaskSession> GetTaskSessionById(long taskSessionId)
@@ -37,9 +37,9 @@ namespace LJBTodo.Services
             return await _taskSessionRepository.GetTaskSessionsForUser(userId);
         }
 
-        public Task<TaskSession> UpdateTaskSession(TaskSession taskSession)
+        public TaskSession UpdateTaskSession(TaskSession taskSession)
         {
-            throw new NotImplementedException();
+            return  _taskSessionRepository.UpdateAsync(taskSession, true);
         }
     }
 }

@@ -8,10 +8,6 @@ import { Cross2Icon } from "@radix-ui/react-icons";
 import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
-import { RepeatTaskTemplate } from "../../types/repeatTaskTemplate";
-import TaskItem from "./TaskItem";
-
-
 
 type TaskFormProps<T extends TaskBase> = {
     todo: T;

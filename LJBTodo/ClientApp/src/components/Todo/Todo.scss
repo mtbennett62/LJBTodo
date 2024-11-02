@@ -113,5 +113,44 @@
 }
 
 .progress-bar {
-    width:300px;
+    width:30%;
+    max-width: 200px;
 }
+
+.rt-Box.TaskSessionContainer {
+    display: flex;
+    justify-content: center;
+    padding: var(--space-5);
+
+    .AccordionItem {
+        min-width: 60vw;
+    }
+
+    .AccordionTrigger {
+        .SessionInfo {
+            flex: 1 0 0;
+            justify-content: center;
+            align-items: center;
+        }
+        .TaskOptions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+    }
+
+    .AccordionContent {
+        align-items: center;
+        .TaskSessionContent{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    }
+}
+
+.rt-TabsContent {
+    background-color: var(--mauve-2);
+
+}
+

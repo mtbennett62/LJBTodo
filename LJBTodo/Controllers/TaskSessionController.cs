@@ -62,13 +62,13 @@ namespace LJBTodo.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<TaskSession>> PutTaskSession(TaskSession taskSession)
+        public ActionResult<TaskSession> PutTaskSession(TaskSession taskSession)
         {
-            var updatedTaskSession = await _taskSessionService.UpdateTaskSession(taskSession);
+            var updatedTaskSession = _taskSessionService.UpdateTaskSession(taskSession);
             return Ok(updatedTaskSession);
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteTaskSession(long id)
         {
             await _taskSessionService.DeleteTaskSession(id);

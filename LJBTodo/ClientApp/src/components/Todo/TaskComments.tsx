@@ -7,7 +7,7 @@ import { Comment } from "../../types/comment";
 import { useDispatch } from "react-redux";
 import { useAuth } from "../../provider/authProvider";
 import { Button, Popover, Text, TextField } from "@radix-ui/themes";
-import '../radix-components.scss';
+import '../radix-styles/radix-components.scss';
 
 
 export type TaskCommentsProps = {

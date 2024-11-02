@@ -82,9 +82,6 @@ public class TodoController : ControllerBase
             item.UserGuid = userGuid;
         }
 
-        //var newItem = _context.TodoItems.Add(item);
-        //await _context.SaveChangesAsync();
-
         var newItem = await _taskService.CreateTask(item);
 
         return CreatedAtAction(nameof(GetTodoItem), new { id = newItem.Id }, newItem);

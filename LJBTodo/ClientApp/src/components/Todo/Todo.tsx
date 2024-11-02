@@ -2,7 +2,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { MixerHorizontalIcon, PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import '../radix-components.scss';
+import '../radix-styles/radix-components.scss';
 import 'react-datepicker/dist/react-datepicker.css'
 import './Todo.scss';
 import { useAuth } from "../../provider/authProvider";
