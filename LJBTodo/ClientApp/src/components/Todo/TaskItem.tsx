@@ -2,13 +2,13 @@ import { TodoItem } from "../../types/todo";
 // import * as Checkbox from "@radix-ui/react-checkbox";
 import { Badge, Button, Checkbox } from "@radix-ui/themes";
 import DatePicker from "react-datepicker";
-import { TrashIcon } from "@radix-ui/react-icons";
+import { LapTimerIcon, TrashIcon } from "@radix-ui/react-icons";
 import * as Dialog from "@radix-ui/react-dialog";
 import TaskForm from "./TaskForm";
 import { Category } from "../../types/category";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Priority } from "../../types/priority";
 import { updateTodo } from "../../redux/todoActions";
 import TaskComments from "./TaskComments";
@@ -21,13 +21,15 @@ type TaskItemProps = {
     toggleComplete: (todo: TodoItem) => void;
     deleteTodo: (id: number) => void;
     handleTaskSave: (task: TodoItem, isUpdate: boolean) => void;
+    isSession?: boolean;
 };
 
-const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handleTaskSave }: TaskItemProps) => {
+const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handleTaskSave, isSession }: TaskItemProps) => {
     const dispatch = useDispatch();
     const { categories, categoriesLoaded } = useSelector((state: RootState) => state.category);
     const { priorities, prioritiesLoaded } = useSelector((state: RootState) => state.priority);
-
+    const { taskSessions, taskSessionsLoaded } = useSelector((state: RootState) => state.session);
+    const [isInSession, setIsInSession] = useState(false);
 
     useEffect(() => {
         let isUpdated = false;
@@ -50,6 +52,12 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
             dispatch(updateTodo(todoCopy));
         }
     }, [prioritiesLoaded, categoriesLoaded, todo]);
+
+    useEffect(() => {
+        if (taskSessionsLoaded) {
+            setIsInSession(taskSessions.some(session => session.todoItems.some(task => task.id === todo.id)));
+        }
+    }, [taskSessionsLoaded, taskSessions, todo]);
     
     return (
         <li  className="TaskItem complete">
@@ -66,6 +74,7 @@ const TaskItem = ({ todo, handleDueDateChange, toggleComplete, deleteTodo, handl
                 </Dialog.Root>
 
                 <div className="RightContent">
+                    {!isSession && isInSession && <Badge title="Assigned to a session" variant="soft" color="gray" radius="full" className="sessionBadge"><LapTimerIcon /></Badge>}
                     <TaskComments todoItem={todo} />
                     {todo.estimatedHours && <Badge variant="solid" color="gray" radius="large" className="estimatedHours">{todo.estimatedHours}h</Badge>}
                     {todo.category && <Badge className="category">{todo.category.name}</Badge>}

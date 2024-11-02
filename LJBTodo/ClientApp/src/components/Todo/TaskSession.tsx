@@ -83,16 +83,16 @@ const TaskSessions = () => {
                 {taskSessions.map((taskSession: TaskSession) => (
                     <Accordion.Item className="AccordionItem" key={`tasksession-${taskSession.id}`} value={`tasksession-${taskSession.id}`}>
                         <Accordion.Trigger className="AccordionTrigger">
-                                <Flex gap="3" className="SessionInfo">
-                                    <Text>{dateDisplay(new Date(taskSession.startDate), new Date(taskSession.endDate))} </Text>
-                                    <Text> {taskSession.todoItems.length} {taskSession.todoItems.length == 1 ? 'task' : 'tasks'}</Text>
-                                    <Text>Total Estimated Hours: {taskSession.todoItems.reduce((sum, item) => sum + (item.estimatedHours || 0), 0)}</Text>
-                                    {taskSession.todoItems.length > 0 && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
-                                </Flex>
-                                <Flex className="TaskOptions">
-                                    <AddTasksPopover taskSession={taskSession} />
-                                    <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="This action is not reversible" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
-                                </Flex>
+                            <Flex gap="3" className="SessionInfo">
+                                <Text>{dateDisplay(new Date(taskSession.startDate), new Date(taskSession.endDate))} </Text>
+                                <Text> {taskSession.todoItems.length} {taskSession.todoItems.length == 1 ? 'task' : 'tasks'}</Text>
+                                <Text>Total Estimated Hours: {taskSession.todoItems.reduce((sum, item) => sum + (item.estimatedHours || 0), 0)}</Text>
+                                {taskSession.todoItems.length > 0 && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
+                            </Flex>
+                            <Flex className="TaskOptions">
+                                <AddTasksPopover taskSession={taskSession} />
+                                <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="This action is not reversible" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
+                            </Flex>
                         </Accordion.Trigger>
                         <Accordion.Content className="AccordionContent Content">
                             <div className="TaskSessionContent">
@@ -144,9 +144,8 @@ const TaskSessionItem = ({ taskSession }: { taskSession: TaskSession }) => {
 
     return (
         <Box className="TaskSessionItem">
-
             {taskSession.todoItems.toSorted((a, b) => Number(a.isComplete) - Number(b.isComplete)).map((todoItem: TodoItem) => (
-                <TaskItem key={`session-${taskSession.id}-task-${todoItem.id}`} todo={todoItem} deleteTodo={deleteTodoItem} handleDueDateChange={handleDueDateChange} handleTaskSave={handleTaskSave} toggleComplete={toggleComplete} />
+                <TaskItem key={`session-${taskSession.id}-task-${todoItem.id}`} isSession={true} todo={todoItem} deleteTodo={deleteTodoItem} handleDueDateChange={handleDueDateChange} handleTaskSave={handleTaskSave} toggleComplete={toggleComplete} />
             ))}
         </Box>
     );
@@ -160,7 +159,6 @@ const AddTasksPopover = ({ taskSession }: { taskSession: TaskSession }) => {
                     <Button size="1" variant="soft">Add tasks</Button>
                 </Popover.Trigger>
                 <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
-
                     <Popover.Content className="PopoverContent">
                         <TaskSessionTaskList taskSession={taskSession} />
                     </Popover.Content>
