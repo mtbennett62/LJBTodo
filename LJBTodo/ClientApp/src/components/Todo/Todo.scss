@@ -35,11 +35,18 @@
         padding: 0;
     }
 
+    .TaskSessionItem {
+        width: calc(100% - 40px);
+    }
+
     .TaskItem {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-top: 20px;
+        &:last-of-type {
+            margin-bottom: 20px;
+        }
 
         .task {
             display: flex;
@@ -152,5 +159,74 @@
 .rt-TabsContent {
     background-color: var(--mauve-2);
 
+}
+
+.DialogOverlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.DialogContent {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 500px;
+    margin: auto;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.DialogTitle {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.DialogDescription {
+    font-size: 1rem;
+    margin-bottom: 20px;
+}
+
+.Label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    margin-bottom: 5px;
+}
+
+.Input, .Select, .date-input input, .Textarea {
+    width: 100%;
+    padding: 8px; /* Reduced padding to decrease height */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.react-datepicker-wrapper {
+    display: flex;
+    flex: auto;
+    .react-datepicker__input-container {
+     display:contents;
+    }
+}
+
+.Select {
+    height: auto; /* Ensure dropdown values are not cut off */
+}
+
+.Button {
+    background-color: #007BFF; /* Changed to a blue color */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.IconButton {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.5rem;
+    color: #333;
 }
 

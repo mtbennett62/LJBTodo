@@ -234,3 +234,5 @@ _Pvt_Extensions
 /LJBTodoTests/obj
 *.dll
 /LJBTodoTests/bin
+/LJBTodoTests/obj
+/LJBTodoTests/obj

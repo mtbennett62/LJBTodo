@@ -66,9 +66,9 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
                 <Dialog.Description className="DialogDescription">Please fill in the details below</Dialog.Description>
                 <Flex gap="2" direction="column">
                     <fieldset>
-                        <label className="Label" htmlFor="description">Description</label>
+                        <label className="Label" htmlFor="title">Title</label>
                         <input
-                            id="description"
+                            id="title"
                             className="Input"
                             type="text"
                             value={taskItem.name}
