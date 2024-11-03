@@ -44,6 +44,7 @@
         align-items: center;
         justify-content: space-between;
         margin-top: 20px;
+
         &:last-of-type {
             margin-bottom: 20px;
         }
@@ -81,10 +82,12 @@
         }
 
         .react-datepicker-wrapper {
+            height: var(--space-5);
+            transform: translateY(-2px);
 
-            // max-width: 35%;
             input {
                 width: unset;
+                height: var(--space-5);
             }
         }
 
@@ -120,7 +123,7 @@
 }
 
 .progress-bar {
-    width:30%;
+    width: 30%;
     max-width: 200px;
 }
 
@@ -139,6 +142,7 @@
             justify-content: center;
             align-items: center;
         }
+
         .TaskOptions {
             display: flex;
             gap: 10px;
@@ -148,7 +152,8 @@
 
     .AccordionContent {
         align-items: center;
-        .TaskSessionContent{
+
+        .TaskSessionContent {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -191,29 +196,37 @@
     margin-bottom: 5px;
 }
 
-.Input, .Select, .date-input input, .Textarea {
-    width: 100%;
-    padding: 8px; /* Reduced padding to decrease height */
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 1rem;
-    margin-bottom: 10px;
+.TaskForm {
+
+    .Input,
+    .Select,
+    .date-input input,
+    .Textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
 }
 
 .react-datepicker-wrapper {
     display: flex;
     flex: auto;
+
     .react-datepicker__input-container {
-     display:contents;
+        display: contents;
     }
 }
 
 .Select {
-    height: auto; /* Ensure dropdown values are not cut off */
+    height: auto;
+    /* Ensure dropdown values are not cut off */
 }
 
 .Button {
-    background-color: #007BFF; /* Changed to a blue color */
+    background-color: #007BFF;
     color: white;
     padding: 10px 20px;
     border: none;
@@ -229,4 +242,3 @@
     font-size: 1.5rem;
     color: #333;
 }
-

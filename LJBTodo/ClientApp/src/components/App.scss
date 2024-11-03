@@ -61,3 +61,60 @@ fieldset{
   padding: unset;
 }
 
+.react-datepicker-popper {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+
+  .react-datepicker__header {
+      background-color: var(--mauve-2);
+      border-bottom: 1px solid #ccc;
+      padding: 10px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+  }
+
+  .react-datepicker__current-month {
+      font-size: 1.2rem;
+      font-weight: bold;
+  }
+
+  .react-datepicker {
+      border: none;
+  }
+
+  .react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name {
+      width: 2.5rem;
+      line-height: 2.5rem;
+      margin: 0.2rem;
+      border-radius: 4px;
+      transition: background-color 0.2s, color 0.2s;
+  }
+
+  .react-datepicker__day:hover, .react-datepicker__time-name:hover {
+      background-color: var(--violet-10);
+      color: #fff;
+  }
+
+  .react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+      background-color: var(--violet-10);
+      color: #fff;
+  }
+
+  .react-datepicker__day--today {
+      font-weight: bold;
+      color: var(--violet-10);
+  }
+
+  .react-datepicker__day--selected:not(.react-datepicker__day--keyboard-selected) {
+      color: #fff; /* Ensure text is legible when not hovering */
+  }
+
+  .react-datepicker__day--selected:hover {
+      background-color: var(--violet-8); /* Slightly lighter shade on hover */
+      color: #fff;
+  }
+}

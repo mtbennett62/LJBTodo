@@ -61,10 +61,10 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
     return (
         <Dialog.Portal container={document.getElementsByClassName('radix-themes')[0]}>
             <Dialog.Overlay className="DialogOverlay" />
-            <Dialog.Content className="DialogContent" aria-description="task form">
+            <Dialog.Content className="DialogContent TaskForm" aria-description="task form">
                 <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
                 <Dialog.Description className="DialogDescription">Please fill in the details below</Dialog.Description>
-                <Flex gap="2" direction="column">
+                <Flex gap="3" direction="column">
                     <fieldset>
                         <label className="Label" htmlFor="title">Title</label>
                         <input
@@ -73,6 +73,7 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
                             type="text"
                             value={taskItem.name}
                             onChange={handleTaskNameChange}
+                            placeholder="Add title..."
                         />
                     </fieldset>
                     <fieldset>
@@ -100,9 +101,9 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
                     <fieldset>
                         <label className="Label" htmlFor="description">Description</label>
                         <textarea
-                            placeholder="Add description"
+                            placeholder="Add description..."
                             id="description"
-                            className="Input"
+                            className="Input textarea"
                             defaultValue={taskItem.description}
                             onChange={(e: any) => setTaskItem({ ...taskItem, description: e.target.value })}
                         />
