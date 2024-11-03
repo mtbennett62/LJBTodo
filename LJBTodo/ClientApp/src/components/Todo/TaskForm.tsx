@@ -9,6 +9,8 @@ import DatePicker from "react-datepicker";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/rootReducer";
 import { Flex } from "@radix-ui/themes";
+import { RepeatTaskTemplate } from "../../types/repeatTaskTemplate";
+import { Frequency } from "../../types/enums/frequency";
 
 type TaskFormProps<T extends TaskBase> = {
     todo: T;
@@ -98,6 +100,39 @@ const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskForm
                             <DatePicker className="Input" selected={(taskItem as unknown as TodoItem).dueDate ?? new Date()} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
                         </fieldset>
                     }
+                    {isRepeatTask && (
+                        <>
+                            <fieldset>
+                                <label className="Label" htmlFor="frequency">Frequency</label>
+                                <select
+                                    id="frequency"
+                                    className="Select Input"
+                                    value={(taskItem as unknown as RepeatTaskTemplate).frequency}
+                                    onChange={(e: any) => {setTaskItem({ ...taskItem, frequency: e.target.value })
+                                    console.log("value", e.target.value);
+                                    console.log("taskItem",taskItem);
+                                    }}
+                                >
+                                    {Object.keys(Frequency).filter(key => isNaN(Number(key))).map(freq => (
+                                        <option key={freq} value={Frequency[freq as keyof typeof Frequency]}>{freq}</option>
+                                    ))}
+                                </select>
+                            </fieldset>
+                            {(taskItem as unknown as RepeatTaskTemplate).frequency == Frequency.Custom && (
+                                <fieldset>
+                                    <label className="Label" htmlFor="customFrequencyDays">Custom Frequency Days</label>
+                                    <input
+                                        id="customFrequencyDays"
+                                        className="Input"
+                                        type="number"
+                                        value={(taskItem as unknown as RepeatTaskTemplate).customFrequencyDays ?? ''}
+                                        onChange={(e: any) => setTaskItem({ ...taskItem, customFrequencyDays: e.target.value })}
+                                        placeholder="Enter custom frequency days..."
+                                    />
+                                </fieldset>
+                            )}
+                        </>
+                    )}
                     <fieldset>
                         <label className="Label" htmlFor="description">Description</label>
                         <textarea
