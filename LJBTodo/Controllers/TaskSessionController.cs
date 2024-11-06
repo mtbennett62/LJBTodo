@@ -82,6 +82,12 @@ namespace LJBTodo.Controllers
             return Ok();
         }
 
+        [HttpPost("addrepeats/{id}")]
+        public async Task<ActionResult<AddRepeatTasksToSessionResponse>> AddRepeatTasksToSession(long id, List<long> templateIds)
+        {
+            return await _taskSessionService.AddRepeatTasksForSession(id, templateIds);
+        }
+
 
     }
 }

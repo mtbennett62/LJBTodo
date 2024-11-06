@@ -4,6 +4,6 @@ namespace LJBTodo.Data.Repositories.Interfaces
 {
     public interface ITodoRepository : IRepository<TodoItem>
     {
-        Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid);
+        Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid, Predicate<TodoItem> predicate = null);
     }
 }

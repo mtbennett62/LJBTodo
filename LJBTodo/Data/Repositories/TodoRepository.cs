@@ -14,10 +14,9 @@ namespace LJBTodo.Data.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid)
+        public async Task<IEnumerable<TodoItem>> GetTodoForUser(Guid userGuid, Predicate<TodoItem> predicate = null)
         {
-            return await _context.TodoItems.Include(t => t.Comments).Where(x => x.UserGuid == userGuid).ToListAsync();
+            return await _context.TodoItems.Include(t => t.Comments).Where(x => x.UserGuid == userGuid && (predicate == null || predicate(x))).ToListAsync();
         }
-
     }
 }

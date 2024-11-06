@@ -1,4 +1,5 @@
-﻿using LJBTodo.Models.Tasks;
+﻿using LJBTodo.Models.DTOs;
+using LJBTodo.Models.Tasks;
 
 namespace LJBTodo.Services
 {
@@ -10,5 +11,6 @@ namespace LJBTodo.Services
         TaskSession UpdateTaskSession(TaskSession taskSession);
         Task DeleteTaskSession(long taskSessionId);
         Task UpdateTasksForSession(long taskSessionId, IEnumerable<long> addedTaskIds, IEnumerable<long> removedTaskIds);
+        Task<AddRepeatTasksToSessionResponse> AddRepeatTasksForSession(long sessionId, List<long> taskIds);
     }
 }

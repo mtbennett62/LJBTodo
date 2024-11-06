@@ -54,5 +54,10 @@ namespace LJBTodo.Data.Repositories
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<RepeatTaskTemplate>> GetRepeatTaskTemplatesByIds(List<long> ids)
+        {
+            return await _context.RepeatTaskTemplates.Where(x => ids.Contains(x.Id)).ToListAsync();
+        }
     }
 }
