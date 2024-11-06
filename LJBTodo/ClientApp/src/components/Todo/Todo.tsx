@@ -18,7 +18,7 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import { Tabs } from "@radix-ui/themes";
 import clsx from "clsx";
 import RepeatTaskList from "./RepeatTaskList";
-import TaskSessions from "./TaskSession";
+import TaskSessions from "./TaskSession/TaskSession";
 
 function Todo() {
 

@@ -1,21 +1,19 @@
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../redux/rootReducer";
-import { useEffect, useState } from "react";
-import { useAuth } from "../../provider/authProvider";
+import { RootState } from "../../../redux/rootReducer";
+import { useEffect } from "react";
+import { useAuth } from "../../../provider/authProvider";
 import axios from "axios";
-import { TaskSession } from "../../types/taskSession";
-import { TodoItem } from "../../types/todo";
-import { addTasksToSession, removeTasksFromSession, setTaskSessions } from "../../redux/taskSessionActions";
+import { TaskSession } from "../../../types/taskSession";
+import { setTaskSessions } from "../../../redux/taskSessionActions";
 import * as Accordion from "@radix-ui/react-accordion";
 import * as Form from "@radix-ui/react-form";
-import * as Popover from "@radix-ui/react-popover";
-import { Box, Button, Flex, Section, Checkbox, Text, Progress } from "@radix-ui/themes";
-import '../radix-styles/radix-components.scss';
-import TaskItem from "./TaskItem";
-import { useTodoCallbacks } from "./todoCallbacks";
-import { useTaskSessionCallbacks } from "./taskSessionCallbacks";
+import { Box, Button, Flex, Text, Progress } from "@radix-ui/themes";
+import '../../radix-styles/radix-components.scss';
+import { useTaskSessionCallbacks } from "../taskSessionCallbacks";
 import { TrashIcon } from "@radix-ui/react-icons";
-import ConfirmDialogButton from "../Shared/ConfirmDialogButton";
+import ConfirmDialogButton from "../../Shared/ConfirmDialogButton";
+import TaskSessionItem from "./TaskSessionItem";
+import AddTasksPopover from "./AddTasksPopover";
 
 const TaskSessions = () => {
     const { taskSessions, taskSessionsLoaded } = useSelector((state: RootState) => state.session);
@@ -90,7 +88,8 @@ const TaskSessions = () => {
                                 {taskSession.todoItems.length > 0 && <Progress className="progress-bar " size="1" value={getProgressByTasks(taskSession)} />}
                             </Flex>
                             <Flex className="TaskOptions">
-                                <AddTasksPopover taskSession={taskSession} />
+                                <AddTasksPopover isRepeat={true} taskSession={taskSession} />
+                                <AddTasksPopover isRepeat={false} taskSession={taskSession} />
                                 <ConfirmDialogButton title="Delete session?" confirmAction={() => deleteSession(taskSession.id)} confirmText="This action is not reversible" confirmButtonText="Delete" cancelButtonText="Cancel" child={<Button variant="ghost" color="red"><TrashIcon /></Button>} />
                             </Flex>
                         </Accordion.Trigger>
@@ -134,118 +133,6 @@ const TaskSessions = () => {
             </Accordion.Root>
         </Box>
     );
-
 };
-
-const TaskSessionItem = ({ taskSession }: { taskSession: TaskSession }) => {
-    const { handleTaskSave, deleteTodoItem, handleDueDateChange, toggleComplete } = useTodoCallbacks();
-
-    useEffect(() => { }, [taskSession.todoItems]);
-
-    return (
-        <Box className="TaskSessionItem">
-            {taskSession.todoItems.toSorted((a, b) => Number(a.isComplete) - Number(b.isComplete)).map((todoItem: TodoItem) => (
-                <TaskItem key={`session-${taskSession.id}-task-${todoItem.id}`} isSession={true} todo={todoItem} deleteTodo={deleteTodoItem} handleDueDateChange={handleDueDateChange} handleTaskSave={handleTaskSave} toggleComplete={toggleComplete} />
-            ))}
-        </Box>
-    );
-};
-
-const AddTasksPopover = ({ taskSession }: { taskSession: TaskSession }) => {
-    return (
-        <div onClick={(e) => e.preventDefault}>
-            <Popover.Root modal>
-                <Popover.Trigger>
-                    <Button size="1" variant="soft">Add tasks</Button>
-                </Popover.Trigger>
-                <Popover.Portal container={document.getElementsByClassName('radix-themes')[0]}>
-                    <Popover.Content className="PopoverContent">
-                        <TaskSessionTaskList taskSession={taskSession} />
-                    </Popover.Content>
-                </Popover.Portal>
-            </Popover.Root>
-        </div>
-    )
-};
-
-
-const TaskSessionTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
-    const { todos } = useSelector((state: RootState) => state.todo);
-    const { getConfig } = useAuth();
-    const dispatch = useDispatch();
-
-    const [selectableTodos, setSelectableTodos] = useState<TodoItem[]>([]);
-    const [addedTaskIds, setAddedIds] = useState<number[]>([]);
-    const [removedTaskIds, setRemovedIds] = useState<number[]>([]);
-
-    useEffect(() => {
-        setSelectableTodos(todos.filter(todo => !todo.isComplete || taskSession.todoItems.some(task => task.id === todo.id)));
-    }, [taskSession.todoItems, todos]);
-
-    const handleCheckedChange = (selected: boolean, id: number) => {
-        if (selected) {
-            if (taskSession.todoItems.some(task => task.id === id)) {
-                setRemovedIds(removedTaskIds.filter(removedId => removedId !== id));
-            }
-            else {
-                setAddedIds([...addedTaskIds, id]);
-            }
-        }
-        else {
-            if (taskSession.todoItems.some(task => task.id === id)) {
-                setRemovedIds([...removedTaskIds, id]);
-            }
-            else {
-                setAddedIds(addedTaskIds.filter(addedId => addedId !== id));
-            }
-        }
-    };
-
-    const handleSave = () => {
-        axios.post(`${import.meta.env.VITE_API_URL}/api/taskSession/updatetasks`, { taskSessionId: taskSession.id, addedTaskIds, removedTaskIds }, getConfig())
-            .then(() => {
-
-                const todosToAdd = todos.filter(todo => addedTaskIds.includes(todo.id));
-
-                dispatch(addTasksToSession(taskSession.id, todosToAdd));
-                dispatch(removeTasksFromSession(taskSession.id, removedTaskIds));
-                setAddedIds([]);
-                setRemovedIds([]);
-            });
-
-    };
-
-    function isChecked(id: number) {
-        return (taskSession.todoItems.some(task => task.id === id) || addedTaskIds.includes(id)) && !removedTaskIds.includes(id);
-    }
-
-    return (
-        <Flex>
-            <Flex gap="3" direction="column" className="taskSessionList">
-                {
-                    selectableTodos.map((todoItem: TodoItem) => (
-                        <Box key={`task-${todoItem.id}`}>
-                            <Flex align="center" gap="2">
-
-                                <Checkbox color="violet" checked={isChecked(todoItem.id)}
-                                    onCheckedChange={(event) => {
-                                        handleCheckedChange(event as boolean, todoItem.id);
-                                    }} />
-                                <Text align="left" key={todoItem.id}>{todoItem.name}</Text>
-                            </Flex>
-
-                        </Box>
-                    ))}
-                <Box>
-                    <Button color="violet" onClick={handleSave}>Save</Button>
-                </Box>
-            </Flex>
-        </Flex>
-    );
-};
-
-
-
-
 
 export default TaskSessions;
