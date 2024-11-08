@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/rootReducer";
 import { useState } from "react";
 import { useTaskSessionCallbacks } from "../taskSessionCallbacks";
+import { Frequency } from "../../../types/enums/frequency";
 
 
 const TaskSessionRepeatTaskList = ({ taskSession }: { taskSession: TaskSession }) => {
@@ -24,6 +25,7 @@ const TaskSessionRepeatTaskList = ({ taskSession }: { taskSession: TaskSession }
     const handleSave = () => {
         addRepeatTasksToSession(taskSession.id, addedIds);
     };
+    console.log("repeatTemplates", repeatTemplates);
 
     return (
         <Flex>
@@ -36,7 +38,9 @@ const TaskSessionRepeatTaskList = ({ taskSession }: { taskSession: TaskSession }
                                     onCheckedChange={(event) => {
                                         handleCheckedChange(event as boolean, template.id);
                                     }} />
-                                <Text align="left" key={template.id}>{template.name}</Text>
+                                <Text align="left" key={`name-${template.id}`}>{template.name}</Text>
+                                <Text>{template.frequency as Frequency === Frequency.Custom && template.customFrequencyDays ? `Every ${template.customFrequencyDays} days` : template.frequency}</Text>
+                                {template.mostRecentCompletion && <Text align="left" key={`completion-date${template.id}`}>Last completed: {template.mostRecentCompletion.toString()}</Text>}
                             </Flex>
                         </Box>
                     ))

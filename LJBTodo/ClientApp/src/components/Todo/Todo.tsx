@@ -1,7 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { MixerHorizontalIcon, PlusIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import '../radix-styles/radix-components.scss';
 import 'react-datepicker/dist/react-datepicker.css'
 import './Todo.scss';
@@ -67,7 +67,7 @@ function Todo() {
         includedUsers: []
     };
 
-    useEffect(() => {
+    useMemo(() => {
         if (todosLoaded) return;
         axios.get(`${import.meta.env.VITE_API_URL}/api/todo`, getConfig())
             .then(response => {
@@ -78,7 +78,7 @@ function Todo() {
 
     }, [todosLoaded]);
 
-    useEffect(() => {
+    useMemo(() => {
         if (prioritiesLoaded) return;
         axios.get(`${import.meta.env.VITE_API_URL}/api/todo/priorities`, getConfig())
             .then(response => {
@@ -87,7 +87,7 @@ function Todo() {
             .catch(error => console.error('There was an error!', error));
     }, [prioritiesLoaded]);
 
-    useEffect(() => {
+    useMemo(() => {
         if (!todosLoaded || !prioritiesLoaded) {
             return;
         }
@@ -99,14 +99,14 @@ function Todo() {
         dispatch(setTodos(todosWithPriority));
     }, [todosLoaded && prioritiesLoaded]);
 
-    useEffect(() => {
+    useMemo(() => {
         if (categoriesLoaded) return;
         axios.get(`${import.meta.env.VITE_API_URL}/api/todo/categories`, getConfig())
             .then(response => {
                 dispatch(setCategories(response.data));
             })
             .catch(error => console.error('There was an error!', error));
-    }), [];
+    }, [categoriesLoaded]);
 
     const deleteTodoItem = useCallback((id: number) => {
         axios.delete(`${import.meta.env.VITE_API_URL}/api/todo/${id}`, getConfig())
