@@ -1,6 +1,6 @@
 ﻿using LJBTodo.Models.DTOs;
 using LJBTodo.Models.Tasks;
-using LJBTodo.Services;
+using LJBTodo.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

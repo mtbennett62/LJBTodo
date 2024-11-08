@@ -1,10 +1,11 @@
 ﻿using LJBTodo.Data;
 using LJBTodo.Models;
 using LJBTodo.Models.Tasks;
-using LJBTodo.Services;
+using LJBTodo.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
@@ -12,25 +13,30 @@ using System.Security.Claims;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TodoController : ControllerBase
+public class TodoController : Controller
 {
-    private readonly ApplicationDbContext _context;
     private readonly ITaskService _taskService;
+    private readonly IPriorityService _priorityService;
+    private readonly ICategoryService _categoryService;
+    private Guid _currentUserGuid;
 
     private UserManager<IdentityUser> _userManager;
 
-    public TodoController(ApplicationDbContext context, UserManager<IdentityUser> userManager, ITaskService taskService)
+    public TodoController(UserManager<IdentityUser> userManager, ITaskService taskService, IPriorityService priorityService, ICategoryService categoryService)
     {
-        _context = context;
         _userManager = userManager;
         _taskService = taskService;
-        if (_context.TodoItems == null || _context.TodoItems.Count() == 0)
-        {
-            // Create a new TodoItem if collection is empty,
-            // which means you can't delete all TodoItems.
-            _context.TodoItems.Add(new TodoItem { Name = "Item1" });
-            _context.SaveChanges();
-        }
+        _priorityService = priorityService;
+
+        _categoryService = categoryService;
+    }
+
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {
+        base.OnActionExecuting(context);
+        ClaimsPrincipal user = this.User;
+        var userId = _userManager.GetUserId(user);
+        _currentUserGuid = Guid.Parse(userId);
     }
 
     [HttpGet]
@@ -39,12 +45,7 @@ public class TodoController : ControllerBase
     {
         try
         {
-            ClaimsPrincipal user = this.User;
-            var userId = _userManager.GetUserId(user);
-            var userGuid = Guid.Parse(userId);
-
-            //return await _context.TodoItems.Where(x => x.UserGuid == userGuid).Include(x => x.Comments).ToListAsync();
-            var items = await _taskService.GetAllTasksForUser(userGuid);
+            var items = await _taskService.GetAllTasksForUser(_currentUserGuid);
             return Ok(items);
         }
         catch (Exception ex)
@@ -57,7 +58,7 @@ public class TodoController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<TodoItem>> GetTodoItem(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        var todoItem = await _taskService.GetTaskById(id);
 
         if (todoItem == null)
         {
@@ -88,15 +89,14 @@ public class TodoController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutTodoItem(long id, TodoItem item)
+    public IActionResult PutTodoItem(long id, TodoItem item)
     {
         if (id != item.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(item).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _taskService.UpdateTask(item);
 
         return NoContent();
     }
@@ -104,50 +104,56 @@ public class TodoController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteTodoItem(long id)
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
-
-        if (todoItem == null)
-        {
-            return NotFound();
-        }
-
-        _context.TodoItems.Remove(todoItem);
-        await _context.SaveChangesAsync();
+        await _taskService.DeleteTask(id);
 
         return NoContent();
     }
 
     [HttpGet("priorities")]
-    public async Task<ActionResult<IEnumerable<Priority>>> GetPriorities()
+    public ActionResult<IEnumerable<Priority>> GetPriorities()
     {
-        return await _context.Priorities.ToListAsync();
+        try
+        {
+            var priorities = _priorityService.GetPriorities();
+            return Ok(priorities);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpGet("categories")]
-    public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
+    public ActionResult<IEnumerable<Category>> GetCategories()
     {
-        return await _context.Category.ToListAsync();
+        try
+        {
+            var categories = _categoryService.GetCategories();
+            return Ok(categories);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpPost("categories")]
     public async Task<ActionResult<Category>> PostCategory(Category category)
     {
-        _context.Category.Add(category);
-        await _context.SaveChangesAsync();
+        var newCategory = await _categoryService.CreateCategory(category);
 
-        return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
+        return CreatedAtAction(nameof(GetCategories), new { id = newCategory.Id }, newCategory);
     }
 
     [HttpPut("categories/{id}")]
-    public async Task<IActionResult> PutCategory(long id, Category category)
+    public IActionResult PutCategory(long id, Category category)
     {
         if (id != category.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(category).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _categoryService.UpdateCategory(category);
 
         return NoContent();
     }
@@ -155,22 +161,20 @@ public class TodoController : ControllerBase
     [HttpPost("priorities")]
     public async Task<ActionResult<Priority>> PostPriority(Priority priority)
     {
-        _context.Priorities.Add(priority);
-        await _context.SaveChangesAsync();
+        var newPriority = await _priorityService.CreatePriority(priority);
 
-        return CreatedAtAction(nameof(GetPriorities), new { id = priority.Id }, priority);
+        return CreatedAtAction(nameof(GetPriorities), new { id = newPriority.Id }, newPriority);
     }
 
     [HttpPut("priorities/{id}")]
-    public async Task<IActionResult> PutPriority(long id, Priority priority)
+    public IActionResult PutPriority(long id, Priority priority)
     {
         if (id != priority.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(priority).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _priorityService.UpdatePriority(priority);
 
         return NoContent();
     }
@@ -178,7 +182,15 @@ public class TodoController : ControllerBase
     [HttpGet("comments/{taskId}")]
     public async Task<ActionResult<IEnumerable<Comment>>> GetComments(long taskId)
     {
-        return await _context.Comments.Where(c => c.TodoItemId == taskId).ToListAsync();
+        try
+        {
+            var comments = await _taskService.GetCommentsForTask(taskId);
+            return Ok(comments);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 
     [HttpPost("comment")]
@@ -192,16 +204,16 @@ public class TodoController : ControllerBase
             comment.CreatedBy = userGuid;
         }
 
-        _context.Comments.Add(comment);
-        await _context.SaveChangesAsync();
+        var newComment = await _taskService.CreateComment(comment);
 
-        return CreatedAtAction(nameof(GetComments), new { taskId = comment.TodoItemId }, comment);
+        return CreatedAtAction(nameof(GetComments), new { taskId = newComment.TodoItemId }, newComment);
     }
 
     [HttpGet("repeatTasks")]
     public async Task<ActionResult<IEnumerable<RepeatTaskTemplate>>> GetRepeatTasks()
     {
-        return await _context.RepeatTaskTemplates.ToListAsync();
+        var templates = await _taskService.GetRepeatTaskTemplatesForUser(_currentUserGuid);
+        return Ok(templates);
     }
 
     [HttpPost("repeatTask")]
@@ -225,15 +237,14 @@ public class TodoController : ControllerBase
     }
 
     [HttpPut("repeatTask/{id}")]
-    public async Task<IActionResult> PutRepeatTask(long id, RepeatTaskTemplate repeatTask)
+    public IActionResult PutRepeatTask(long id, RepeatTaskTemplate repeatTask)
     {
         if (id != repeatTask.Id)
         {
             return BadRequest();
         }
 
-        _context.Entry(repeatTask).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
+        _taskService.UpdateRepeatTaskTemplate(repeatTask);
 
         return NoContent();
     }
@@ -241,15 +252,7 @@ public class TodoController : ControllerBase
     [HttpDelete("repeatTask/{id}")]
     public async Task<IActionResult> DeleteRepeatTask(long id)
     {
-        var repeatTask = await _context.RepeatTaskTemplates.FindAsync(id);
-
-        if (repeatTask == null)
-        {
-            return NotFound();
-        }
-
-        _context.RepeatTaskTemplates.Remove(repeatTask);
-        await _context.SaveChangesAsync();
+        await _taskService.DeleteRepeatTaskTemplate(id);
 
         return NoContent();
     }
@@ -257,7 +260,7 @@ public class TodoController : ControllerBase
     [HttpGet("repeatTask/{id}")]
     public async Task<ActionResult<RepeatTaskTemplate>> GetRepeatTask(long id)
     {
-        var repeatTask = await _context.RepeatTaskTemplates.FindAsync(id);
+        var repeatTask = await _taskService.GetRepeatTaskTemplateById(id);
 
         if (repeatTask == null)
         {

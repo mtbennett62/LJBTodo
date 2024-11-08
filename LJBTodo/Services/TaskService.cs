@@ -1,16 +1,19 @@
 ﻿using LJBTodo.Data.Repositories.Interfaces;
 using LJBTodo.Models.Tasks;
+using LJBTodo.Services.Interfaces;
 
 namespace LJBTodo.Services
 {
     public class TaskService : ITaskService
     {
         private readonly ITodoRepository _todoRepository;
-        private readonly IRepository<RepeatTaskTemplate> _repeatTaskTemplateRepository;
-        public TaskService(ITodoRepository todoRepository, IRepository<RepeatTaskTemplate> repeateTaskTemplateRepository)
+        private readonly IRepeatTaskTemplateRepository _repeatTaskTemplateRepository;
+        private readonly IRepository<Comment> _commentRepository;
+        public TaskService(ITodoRepository todoRepository, IRepeatTaskTemplateRepository repeateTaskTemplateRepository, IRepository<Comment> commentRepository)
         {
             _todoRepository = todoRepository;
             _repeatTaskTemplateRepository = repeateTaskTemplateRepository;
+            _commentRepository = commentRepository;
         }
 
         public async Task<T> CreateTask<T>(T task) where T : TaskItem
@@ -58,6 +61,51 @@ namespace LJBTodo.Services
         public TodoItem UpdateTask(TodoItem task)
         {
             return _todoRepository.UpdateAsync(task, true);
+        }
+
+        public async Task<IEnumerable<RepeatTaskTemplate>> GetRepeatTaskTemplatesForUser(Guid userGuid)
+        {
+            return await _repeatTaskTemplateRepository.GetAllTemplatesForUser(userGuid);
+        }
+
+        public async Task<Comment> CreateComment(Comment comment)
+        {
+            return await _commentRepository.CreateAsync(comment, true);
+        }
+
+        public async Task<Comment> GetCommentById(long commentId)
+        {
+            return await _commentRepository.GetByIdAsync(commentId);
+        }
+
+        public Comment UpdateComment(Comment comment)
+        {
+            return _commentRepository.UpdateAsync(comment, true);
+        }
+
+        public async Task DeleteComment(long commentId)
+        {
+            await _commentRepository.DeleteAsync(commentId, true);
+        }
+
+        public async Task<IEnumerable<Comment>> GetCommentsForTask(long taskId)
+        {
+            return await _commentRepository.GetAllWithPredicateAsync( x => x.TodoItemId == taskId);
+        }
+
+        public RepeatTaskTemplate UpdateRepeatTaskTemplate(RepeatTaskTemplate repeatTaskTemplate)
+        {
+            return _repeatTaskTemplateRepository.UpdateAsync(repeatTaskTemplate, true);
+        }
+
+        public async Task DeleteRepeatTaskTemplate(long repeatTaskTemplateId)
+        {
+            await _repeatTaskTemplateRepository.DeleteAsync(repeatTaskTemplateId, true);
+        }
+
+        public async Task<RepeatTaskTemplate> GetRepeatTaskTemplateById(long repeatTaskTemplateId)
+        {
+            return await _repeatTaskTemplateRepository.GetByIdAsync(repeatTaskTemplateId);
         }
     }
 }

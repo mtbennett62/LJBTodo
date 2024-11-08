@@ -1,6 +1,7 @@
 ﻿using LJBTodo.Data.Repositories.Interfaces;
 using LJBTodo.Models.DTOs;
 using LJBTodo.Models.Tasks;
+using LJBTodo.Services.Interfaces;
 
 namespace LJBTodo.Services
 {
@@ -54,7 +55,7 @@ namespace LJBTodo.Services
 
             foreach (var repeatTaskTemplate in repeatTaskTemplates)
             {
-                var createdTodoItem = await CreateTodoItemFromRepeatTask(repeatTaskTemplate);
+                var createdTodoItem = await CreateTodoItemFromRepeatTask(repeatTaskTemplate, taskSession.EndDate);
 
                 addedTodoItems.Add(createdTodoItem);
             }
@@ -66,7 +67,7 @@ namespace LJBTodo.Services
             return new AddRepeatTasksToSessionResponse { TaskSessionId = sessionId, AddedTodoItems = addedTodoItems };
         }
 
-        private async Task<TodoItem> CreateTodoItemFromRepeatTask(RepeatTaskTemplate repeatTask)
+        private async Task<TodoItem> CreateTodoItemFromRepeatTask(RepeatTaskTemplate repeatTask, DateTime dueDate)
         {
             var newTask = new TodoItem
             {
@@ -79,7 +80,8 @@ namespace LJBTodo.Services
                 UserGuid = repeatTask.UserGuid,
                 Priority = repeatTask.Priority,
                 PriorityId = repeatTask.PriorityId,
-                RepeatTaskId = repeatTask.Id
+                RepeatTaskId = repeatTask.Id,
+                DueDate = dueDate
             };
 
             return await _todoRepository.CreateAsync(newTask);

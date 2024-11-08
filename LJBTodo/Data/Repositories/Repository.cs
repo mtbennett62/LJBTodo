@@ -1,4 +1,5 @@
 ﻿using LJBTodo.Data.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LJBTodo.Data.Repositories
 {
@@ -44,6 +45,16 @@ namespace LJBTodo.Data.Repositories
                 _context.SaveChanges();
             }
             return entity;
+        }
+
+        public IEnumerable<TEntity> GetAll()
+        {
+            return  _context.Set<TEntity>().AsNoTracking();
+        }
+
+        public async Task<IEnumerable<TEntity>> GetAllWithPredicateAsync(Predicate<TEntity> predicate)
+        {
+            return await _context.Set<TEntity>().Where(x => predicate(x)).ToListAsync();
         }
 
         public async Task SaveAsync()

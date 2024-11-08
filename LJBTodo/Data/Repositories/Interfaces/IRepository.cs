@@ -8,6 +8,7 @@
         Task DeleteAsync(long id, bool? saveChanges = null);
         Task<TEntity> GetByIdAsync(long id);
         Task SaveAsync();
-
+        IEnumerable<TEntity> GetAll();
+        Task<IEnumerable<TEntity>> GetAllWithPredicateAsync(Predicate<TEntity> predicate);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using LJBTodo.Models.DTOs;
 using LJBTodo.Models.Tasks;
 
-namespace LJBTodo.Services
+namespace LJBTodo.Services.Interfaces
 {
     public interface ITaskSessionService
     {

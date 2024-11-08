@@ -5,6 +5,7 @@ using LJBTodo.Models;
 using LJBTodo.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using LJBTodo.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +23,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<ITaskSessionRepository, TaskSessionRepository>();
+builder.Services.AddScoped<IRepeatTaskTemplateRepository, RepeatTaskTemplateRepository>();
 
 builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<ITaskSessionService, TaskSessionService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IPriorityService, PriorityService>();
+
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
