@@ -17,14 +17,16 @@ namespace LJBTodo.Tests.Services
     {
         private Mock<ITodoRepository> _todoRepositoryMock;
         private TaskService _taskService;
-        private Mock<IRepository<RepeatTaskTemplate>> _repeatTaskTemplateRepositoryMock;
+        private Mock<IRepeatTaskTemplateRepository> _repeatTaskTemplateRepositoryMock;
+        private Mock<IRepository<Comment>> _commentRepositoryMock;
 
         [SetUp]
         public void Setup()
         {
             _todoRepositoryMock = new Mock<ITodoRepository>();
-            _repeatTaskTemplateRepositoryMock = new Mock<IRepository<RepeatTaskTemplate>>();
-            _taskService = new TaskService(_todoRepositoryMock.Object, _repeatTaskTemplateRepositoryMock.Object);
+            _repeatTaskTemplateRepositoryMock = new Mock<IRepeatTaskTemplateRepository>();
+            _commentRepositoryMock = new Mock<IRepository<Comment>>();
+            _taskService = new TaskService(_todoRepositoryMock.Object, _repeatTaskTemplateRepositoryMock.Object, _commentRepositoryMock.Object);
         }
 
         [Test]
@@ -38,7 +40,7 @@ namespace LJBTodo.Tests.Services
                     new TodoItem { Id = 2, UserGuid = userId, Description = "Task 2" },
                     new TodoItem { Id = 3, UserGuid = userId, Description = "Task 3" }
                 };
-            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId)).ReturnsAsync(expectedTasks);
+            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId, null)).ReturnsAsync(expectedTasks);
 
             // Act
             var result = await _taskService.GetAllTasksForUser(userId);
@@ -54,7 +56,7 @@ namespace LJBTodo.Tests.Services
             // Arrange
             Guid userId = Guid.NewGuid();
             IEnumerable<TodoItem> expectedTasks = new List<TodoItem>();
-            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId)).ReturnsAsync(expectedTasks);
+            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId, null)).ReturnsAsync(expectedTasks);
 
             // Act
             var result = await _taskService.GetAllTasksForUser(userId);
@@ -75,7 +77,7 @@ namespace LJBTodo.Tests.Services
                     new TodoItem { Id = 2, UserGuid = userId, Description = "Task 2" },
                     new TodoItem { Id = 3, UserGuid = userId, Description = "Task 3" }
                 };
-            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId)).ReturnsAsync(expectedTasks);
+            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId, null)).ReturnsAsync(expectedTasks);
 
             // Act
             var result = await _taskService.GetAllTasksForUser(otherUserId);
@@ -104,7 +106,7 @@ namespace LJBTodo.Tests.Services
                     new TodoItem { Id = 8, UserGuid = userId, Description = "Task 8", DueDate = DateTime.Now.AddDays(3), Priority = priorityLow },
                     new TodoItem { Id = 9, UserGuid = userId, Description = "Task 9", DueDate = DateTime.Now.AddDays(2), Priority = priorityLow }
                 };
-            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId)).ReturnsAsync(expectedTasks);
+            _todoRepositoryMock.Setup(repo => repo.GetTodoForUser(userId, null)).ReturnsAsync(expectedTasks);
 
             // Act
             var result = await _taskService.GetAllTasksForUser(userId);
