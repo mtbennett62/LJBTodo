@@ -109,6 +109,14 @@ public class TodoController : Controller
         return NoContent();
     }
 
+    [HttpPut("{id}/complete")]
+    public async Task<IActionResult> ToggleCompleteTodoItem(long id)
+    {
+        await _taskService.ToggleCompleteTask(id);
+
+        return NoContent();
+    }
+
     [HttpGet("priorities")]
     public ActionResult<IEnumerable<Priority>> GetPriorities()
     {

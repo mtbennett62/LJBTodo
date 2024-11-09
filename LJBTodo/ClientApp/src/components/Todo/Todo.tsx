@@ -116,7 +116,7 @@ function Todo() {
 
     const toggleComplete = useCallback((todo: TodoItem) => {
         const updatedTodo = { ...todo, isComplete: !todo.isComplete };
-        axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${todo.id}`, updatedTodo, getConfig())
+        axios.put(`${import.meta.env.VITE_API_URL}/api/todo/${todo.id}/complete`, {}, getConfig())
             .then(() => dispatch(updateTodo(updatedTodo)))
             .catch(error => console.error('There was an error!', error));
     }, [todos]);

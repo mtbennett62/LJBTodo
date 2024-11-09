@@ -107,5 +107,29 @@ namespace LJBTodo.Services
         {
             return await _repeatTaskTemplateRepository.GetByIdAsync(repeatTaskTemplateId);
         }
+
+        public async Task ToggleCompleteTask(long taskId)
+        {
+            var task = await _todoRepository.GetByIdAsync(taskId);
+            if (task == null) return;
+
+            task.IsComplete = !task.IsComplete;
+
+            if(task.IsComplete && task.RepeatTaskId != null)
+            {
+                await SetLastCompletedDate((long)task.RepeatTaskId);   
+            }
+
+            await _todoRepository.SaveAsync();
+        }
+
+        private async Task SetLastCompletedDate(long repeatTaskId)
+        {
+            var repeatTask = await _repeatTaskTemplateRepository.GetByIdAsync(repeatTaskId);
+
+            repeatTask.MostRecentCompletion = DateTime.UtcNow;
+
+            _repeatTaskTemplateRepository.UpdateAsync(repeatTask);
+        }
     }
 }

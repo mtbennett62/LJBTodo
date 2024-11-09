@@ -9,6 +9,7 @@ namespace LJBTodo.Services.Interfaces
         Task<T> CreateTask<T>(T task) where T : TaskItem;
         TodoItem UpdateTask(TodoItem task);
         Task DeleteTask(long taskId);
+        Task ToggleCompleteTask(long taskId);
 
         Task<IEnumerable<RepeatTaskTemplate>> GetRepeatTaskTemplatesForUser(Guid userGuid);
         RepeatTaskTemplate UpdateRepeatTaskTemplate(RepeatTaskTemplate repeatTaskTemplate);
