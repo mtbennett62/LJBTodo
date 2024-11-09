@@ -1,0 +1,172 @@
+import { useState } from "react";
+import { useAuth } from "../../provider/authProvider";
+import { TaskBase, TodoItem } from "../../types/todo";
+import axios from "axios";
+
+import * as Dialog from "@radix-ui/react-dialog";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import DatePicker from "react-datepicker";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/rootReducer";
+import { Flex } from "@radix-ui/themes";
+import { RepeatTaskTemplate } from "../../types/repeatTaskTemplate";
+import { Frequency } from "../../types/enums/frequency";
+
+type TaskFormProps<T extends TaskBase> = {
+    todo: T;
+    isEdit: boolean;
+    handleTaskSave: (task: T, isUpdate: boolean) => void;
+};
+
+const TaskForm = <T extends TaskBase>({ todo, isEdit, handleTaskSave }: TaskFormProps<T>) => {
+
+    const { priorities } = useSelector((state: RootState) => state.priority);
+
+    const { getConfig } = useAuth();
+    const { categories } = useSelector((state: RootState) => state.category);
+
+    const [taskItem, setTaskItem] = useState<T>({ ...todo });
+
+    const isRepeatTask = !('dueDate' in todo);
+    const endpoint = isRepeatTask ? 'todo/repeatTask' : 'todo';
+
+    function handleTaskNameChange(e: any) {
+        setTaskItem({
+            ...taskItem,
+            name: e.target.value
+        });
+    }
+
+    function handleTaskPriorityChange(e: any) {
+        setTaskItem({
+            ...taskItem,
+            priorityId: e.target.value
+        });
+    }
+
+    function save() {
+        if (isEdit) {
+            axios.put(`${import.meta.env.VITE_API_URL}/api/${endpoint}/${taskItem.id}`, taskItem, getConfig())
+                .then(() => {
+                    handleTaskSave(taskItem, true);
+                })
+                .catch(error => console.error('There was an error!', error));
+        } else {
+            axios.post(`${import.meta.env.VITE_API_URL}/api/${endpoint}`, taskItem, getConfig())
+                .then((response) => {
+                    handleTaskSave(response.data, false);
+                })
+                .catch(error => console.error('There was an error!', error));
+        }
+    }
+
+    return (
+        <Dialog.Portal container={document.getElementsByClassName('radix-themes')[0]}>
+            <Dialog.Overlay className="DialogOverlay" />
+            <Dialog.Content className="DialogContent TaskForm" aria-description="task form">
+                <Dialog.Title className="DialogTitle">Add a new task</Dialog.Title>
+                <Dialog.Description className="DialogDescription">Please fill in the details below</Dialog.Description>
+                <Flex gap="3" direction="column">
+                    <fieldset>
+                        <label className="Label" htmlFor="title">Title</label>
+                        <input
+                            id="title"
+                            className="Input"
+                            type="text"
+                            value={taskItem.name}
+                            onChange={handleTaskNameChange}
+                            placeholder="Add title..."
+                        />
+                    </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="priority">Priority</label>
+                        <select id="priority" className="Select Input" value={taskItem.priorityId} onChange={handleTaskPriorityChange}>
+                            {priorities.length > 0 && priorities.map(priority => (
+                                <option key={priority.id} value={priority.id}>{priority.name}</option>
+                            ))}
+                        </select>
+                    </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="category">Category</label>
+                        <select id="category" className="Select Input" value={taskItem.categoryId} onChange={(e: any) => setTaskItem({ ...taskItem, categoryId: e.target.value })}>
+                            {categories.length > 0 && categories.map(category => (
+                                <option key={category.id} value={category.id}>{category.name}</option>
+                            ))}
+                        </select>
+                    </fieldset>
+                    {!isRepeatTask &&
+                        <fieldset className="date-input">
+                            <label className="Label" htmlFor="dueDate">Due Date</label>
+                            <DatePicker className="Input" selected={(taskItem as unknown as TodoItem).dueDate ?? new Date()} onChange={(date: any) => setTaskItem({ ...taskItem, dueDate: date })} />
+                        </fieldset>
+                    }
+                    {isRepeatTask && (
+                        <>
+                            <fieldset>
+                                <label className="Label" htmlFor="frequency">Frequency</label>
+                                <select
+                                    id="frequency"
+                                    className="Select Input"
+                                    value={(taskItem as unknown as RepeatTaskTemplate).frequency}
+                                    onChange={(e: any) => {setTaskItem({ ...taskItem, frequency: e.target.value })
+                                    console.log("value", e.target.value);
+                                    console.log("taskItem",taskItem);
+                                    }}
+                                >
+                                    {Object.keys(Frequency).filter(key => isNaN(Number(key))).map(freq => (
+                                        <option key={freq} value={Frequency[freq as keyof typeof Frequency]}>{freq}</option>
+                                    ))}
+                                </select>
+                            </fieldset>
+                            {(taskItem as unknown as RepeatTaskTemplate).frequency == Frequency.Custom && (
+                                <fieldset>
+                                    <label className="Label" htmlFor="customFrequencyDays">Custom Frequency Days</label>
+                                    <input
+                                        id="customFrequencyDays"
+                                        className="Input"
+                                        type="number"
+                                        value={(taskItem as unknown as RepeatTaskTemplate).customFrequencyDays ?? ''}
+                                        onChange={(e: any) => setTaskItem({ ...taskItem, customFrequencyDays: e.target.value })}
+                                        placeholder="Enter custom frequency days..."
+                                    />
+                                </fieldset>
+                            )}
+                        </>
+                    )}
+                    <fieldset>
+                        <label className="Label" htmlFor="description">Description</label>
+                        <textarea
+                            placeholder="Add description..."
+                            id="description"
+                            className="Input textarea"
+                            defaultValue={taskItem.description}
+                            onChange={(e: any) => setTaskItem({ ...taskItem, description: e.target.value })}
+                        />
+                    </fieldset>
+                    <fieldset>
+                        <label className="Label" htmlFor="estimatedHours">Estimated Hours</label>
+                        <input
+                            placeholder="Add estimate"
+                            id="estimatedHours"
+                            className="Input"
+                            type="number"
+                            defaultValue={taskItem.estimatedHours}
+                            onChange={(e: any) => e.target.value && setTaskItem({ ...taskItem, estimatedHours: e.target.value })} />
+                    </fieldset>
+                </Flex>
+                <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
+                    <Dialog.Close asChild>
+                        <button className="Button green" onClick={save}>Save</button>
+                    </Dialog.Close>
+                </div>
+                <Dialog.Close asChild>
+                    <button className="IconButton" aria-label="Close">
+                        <Cross2Icon />
+                    </button>
+                </Dialog.Close>
+            </Dialog.Content>
+        </Dialog.Portal>
+    )
+}
+
+export default TaskForm;

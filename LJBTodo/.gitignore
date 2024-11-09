@@ -230,10 +230,4 @@ _Pvt_Extensions
 
 # FAKE - F# Make
 .fake/
-/LJBTodoTests/obj
-/LJBTodoTests/obj
-*.dll
-/LJBTodoTests/bin
-/LJBTodoTests/obj
-/LJBTodoTests/obj
-/LJBTodoTests/obj
+

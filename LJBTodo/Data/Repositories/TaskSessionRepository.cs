@@ -1,0 +1,63 @@
+﻿
+using LJBTodo.Data.Repositories.Interfaces;
+using LJBTodo.Models.Tasks;
+using Microsoft.EntityFrameworkCore;
+
+namespace LJBTodo.Data.Repositories
+{
+    public class TaskSessionRepository : Repository<TaskSession>, ITaskSessionRepository
+    {
+        private readonly ApplicationDbContext _context;
+
+        public TaskSessionRepository(ApplicationDbContext context) : base(context)
+        {
+            _context = context;
+        }
+
+        public async Task<IEnumerable<TaskSession>> GetTaskSessionsForUser(Guid userGuid)
+        {
+            return await _context.TaskSessions.Where(x => x.UserGuid == userGuid).Include(ts => ts.TodoItems).ToListAsync();
+        }
+
+        public async Task UpdateTasksForSession(long taskSessionId, IEnumerable<long> addedTaskIds, IEnumerable<long> removedTaskIds)
+        {
+            var taskSession = await _context.TaskSessions.Include(x => x.TodoItems).FirstOrDefaultAsync(x => x.Id == taskSessionId);
+
+            foreach (var id in addedTaskIds)
+            {
+                if (taskSession.TodoItems.Any(x => x.Id == id)) break;
+                var todo = new TodoItem { Id = id };
+                _context.Attach(todo);
+                taskSession.TodoItems.Add(todo);
+            }
+
+            if (removedTaskIds.Any())
+            {
+                taskSession.TodoItems.RemoveAll(x => removedTaskIds.Contains(x.Id));
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteTaskSession(long taskSessionId)
+        {
+            var taskSession = await _context.TaskSessions.Include(x => x.TodoItems).FirstOrDefaultAsync(x => x.Id == taskSessionId);
+
+            if (taskSession == null) return;
+
+            if (taskSession.TodoItems.Any())
+            {
+                taskSession.TodoItems.Clear();
+            }
+
+            _context.TaskSessions.Remove(taskSession);
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<RepeatTaskTemplate>> GetRepeatTaskTemplatesByIds(List<long> ids)
+        {
+            return await _context.RepeatTaskTemplates.Where(x => ids.Contains(x.Id)).ToListAsync();
+        }
+    }
+}
